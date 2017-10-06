@@ -1,4 +1,4 @@
-package util;
+package ru.snake_game.util;
 
 public class Vector {
     private int x, y;
