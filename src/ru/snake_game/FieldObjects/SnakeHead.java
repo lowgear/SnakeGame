@@ -16,6 +16,11 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         this.direction = direction;
     }
 
+    public void Eat(Location apple)
+    {
+
+    }
+
     public void Move() {
         MoveChild();
         location = location.Moved(direction);
