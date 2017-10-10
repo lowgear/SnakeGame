@@ -38,5 +38,9 @@ public class Game implements IGame {
             if (directionObject instanceof Apple)
                 snakeHead.Eat(new Location(direction.getX(), direction.getY()));
         }
+        else
+        {
+            /*I think we should inform that snake can`t go*/
+        }
     }
 }
