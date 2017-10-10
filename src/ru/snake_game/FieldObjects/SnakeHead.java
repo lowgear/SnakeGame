@@ -7,6 +7,8 @@ import ru.snake_game.util.Vector;
 public class SnakeHead extends SnakePart implements ISnakeHead {
     private Vector direction;
 
+    private boolean ateRecently = false;
+
     public SnakeHead(Location location, SnakeBody prev, Vector direction) {
         super(location, prev);
 
@@ -16,13 +18,20 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         this.direction = direction;
     }
 
-    public void Eat(Location apple)
+    public SnakeBody Eat(Location apple)
     {
-
+        SnakeBody t = new SnakeBody(location, prev, this);
+        prev.next = t;
+        prev = t;
+        ateRecently = true;
+        return t;
     }
 
     public void Move() {
-        MoveChild();
+        if (!ateRecently)
+            MoveChild();
+        else
+            ateRecently = false;
         location = location.Moved(direction);
     }
 
