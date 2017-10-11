@@ -1,5 +1,6 @@
 package ru.snake_game.util;
 
+@SuppressWarnings("InstanceVariableNamingConvention")
 public class Vector {
     private int x, y;
     public Vector(int x, int y)
@@ -25,4 +26,6 @@ public class Vector {
         }
         return false;
     }
+
+    public final static Vector ZERO = new Vector(0, 0);
 }

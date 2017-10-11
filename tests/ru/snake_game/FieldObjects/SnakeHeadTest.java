@@ -1,19 +1,16 @@
 package ru.snake_game.FieldObjects;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import ru.snake_game.util.Location;
 import ru.snake_game.util.Vector;
 
-import java.lang.reflect.Array;
-
 import static org.junit.Assert.*;
 
 public class SnakeHeadTest {
     private SnakeHead snake;
-    Apple apple = new Apple(new Location(-1, -1));
+    private Apple apple = new Apple(new Location(-1, -1));
 
     @Before
     public void setUp() throws Exception {
@@ -27,71 +24,80 @@ public class SnakeHeadTest {
 
     @Test
     public void kill() throws Exception {
-        assertTrue(snake.IsAlive());
-        snake.Kill();
-        assertFalse(snake.IsAlive());
-        snake.Kill();
-        assertFalse(snake.IsAlive());
+        assertTrue(snake.isAlive());
+        snake.kill();
+        assertFalse(snake.isAlive());
+        snake.kill();
+        assertFalse(snake.isAlive());
     }
 
     @Test
     public void isAlive() throws Exception {
-        assertTrue(snake.IsAlive());
-        assertTrue(snake.IsAlive());
-        snake.Kill();
-        assertFalse(snake.IsAlive());
-        assertFalse(snake.IsAlive());
+        assertTrue(snake.isAlive());
+        assertTrue(snake.isAlive());
+        snake.kill();
+        assertFalse(snake.isAlive());
+        assertFalse(snake.isAlive());
     }
 
     @Test
-    public void eat() throws Exception {
-        assertEquals(1, snake.Length());
-        assertEquals(1, snake.Length());
-        snake.Eat(new Apple(new Location(0, 1)));
-        assertEquals(2, snake.Length());
-        assertEquals(2, snake.Length());
-        snake.Eat(new Apple(new Location(0, 1)));
-        assertEquals(3, snake.Length());
-        assertEquals(3, snake.Length());
-        snake.Eat(new Apple(new Location(0, 1)));
-        assertEquals(4, snake.Length());
-        assertEquals(4, snake.Length());
-        snake.Eat(new Apple(new Location(0, 1)));
-        assertEquals(5, snake.Length());
-        assertEquals(5, snake.Length());
+    public void lengthAfterGrow() throws Exception {
+        snake.grow();
+        assertEquals(2, snake.length());
+        assertEquals(2, snake.length());
     }
 
     @Test
-    public void move() throws Exception {
-        assertEquals(new Location(0, 0), snake.location);
-        snake.Eat(apple);
-        snake.Move();
-        assertEquals(new Location(0, 1), snake.location);
-        assertEquals(new Location(0, 0), snake.prev.location);
-        snake.SetDirection(new Vector(1, 0));
-        snake.Eat(apple);
-        snake.Move();
-        assertEquals(new Location(1, 1), snake.location);
-        assertEquals(new Location(0, 1), snake.prev.location);
-        assertEquals(new Location(0, 0), snake.prev.prev.location);
+    public void moveEat() throws Exception {
+        snake.grow();
+        snake.move();
+        assertEquals(new Location(0, 1), snake.getLocation());
+        assertEquals(new Location(0, 0), snake.prev.getLocation());
     }
 
     @Test
-    public void getDirection() throws Exception {
-        assertEquals(new Vector(0, 1), snake.GetDirection());
-        snake.SetDirection(new Vector(0, -1));
-        assertEquals(new Vector(0, -1), snake.GetDirection());
+    public void moveEatTurn() throws Exception {
+        snake.grow();
+        snake.move();
+        snake.setDirection(new Vector(1, 0));
+        snake.grow();
+        snake.move();
+        assertEquals(new Location(1, 1), snake.getLocation());
+        assertEquals(new Location(0, 1), snake.prev.getLocation());
+        assertEquals(new Location(0, 0), snake.prev.prev.getLocation());
     }
 
     @Test
-    public void length() throws Exception
-    {
-        assertEquals(1, snake.Length());
-        snake.Eat(apple);
-        assertEquals(2, snake.Length());
-        snake.Eat(apple);
-        assertEquals(3, snake.Length());
-        snake.Eat(apple);
-        assertEquals(4, snake.Length());
+    public void setDirection() throws Exception {
+        snake.setDirection(new Vector(0, -1));
+        assertEquals(new Vector(0, -1), snake.getDirection());
     }
+
+    @Test
+    public void initialLength() throws Exception {
+        assertEquals(snake.length(), 1);
+    }
+
+    @Test
+    public void initialLocation() throws Exception {
+        assertEquals(snake.getLocation(), new Location(0, 0));
+    }
+
+    @Test
+    public void initialDirection() throws Exception {
+        assertEquals(snake.getDirection(), new Vector(0, 1));
+    }
+
+    @Test
+    public void initiallyAlive() throws Exception {
+        assertTrue(snake.isAlive());
+    }
+
+
+    /*
+    TODO:
+    wall kill
+    snake kill
+    cycle alive
+     */
 }

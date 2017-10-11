@@ -18,30 +18,30 @@ public class Game implements IGame {
         field.CreateField();
     }
 
-    public void Tick() throws Exception
+    public void tick() throws IllegalStateException
     {
         SnakeHead snakeHead = field.GetSnakeHead();
 
         if (snakeHead == null)
-            throw new Exception("Snake not found");
+            throw new IllegalStateException("Snake not found");
 
-        Vector direction = snakeHead.GetDirection();
+        Vector direction = snakeHead.getDirection();
         Location objectLocation = snakeHead.getLocation().Moved(direction);
-        AbstractFieldObject directionObject = field.FieldObjectAt(objectLocation);
+        AbstractFieldObject directionObject = field.fieldObjectAt(objectLocation);
         if (directionObject instanceof  IWalkableFieldObject)
         {
             if (directionObject instanceof Apple)
             {
-                SnakeBody newPart = snakeHead.Eat((Apple)directionObject);
+                SnakeBody newPart = snakeHead.grow();
                 field.field.add(field.GetIndexInField(objectLocation), snakeHead);
                 field.field.add(field.GetIndexInField(snakeHead.getLocation()), newPart);
             }
-            snakeHead.Move();
+            snakeHead.move();
             field.Refresh();
         }
         else
         {
-            snakeHead.Kill();
+            snakeHead.kill();
         }
     }
 }

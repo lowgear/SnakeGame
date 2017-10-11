@@ -9,32 +9,29 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
     private boolean ateRecently = false;
 
-    private boolean isAlive = true;
-    private final static Vector noDirection = new Vector(0, 0);
+    private boolean alive = true;
 
     public SnakeHead(Location location, SnakeBody prev, Vector direction) {
         super(location, prev);
 
-        SetDirection(direction);
+        setDirection(direction);
     }
 
-    public void Kill()
+    public void kill()
     {
-        isAlive = false;
+        alive = false;
     }
 
-    public boolean IsAlive()
+    public boolean isAlive()
     {
-        return isAlive;
+        return alive;
     }
 
-    public SnakeBody Eat(Apple apple) throws NullPointerException, IllegalStateException
+    public SnakeBody grow() throws IllegalStateException
     {
-        if (apple == null)
-            throw new NullPointerException("Apple cant be null.");
-        if (!IsAlive())
-            throw new IllegalStateException("Dead snake can't eat.");
-        SnakeBody t = new SnakeBody(location, prev, this);
+        if (!isAlive())
+            throw new IllegalStateException("Dead snake can't grow.");
+        SnakeBody t = new SnakeBody(getLocation(), prev, this);
         if (prev != null)
             prev.next = t;
         prev = t;
@@ -42,23 +39,23 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         return t;
     }
 
-    public void Move() {
-        if (!IsAlive())
+    public void move() {
+        if (!isAlive())
             return;
         if (!ateRecently)
             MoveChild();
         else
             ateRecently = false;
-        location = location.Moved(direction);
+        setLocation(getLocation().Moved(direction));
     }
 
-    public Vector GetDirection() {
-        if (!IsAlive())
-            return noDirection;
+    public Vector getDirection() {
+        if (!isAlive())
+            return Vector.ZERO;
         return direction;
     }
 
-    public void SetDirection(Vector direction)
+    public void setDirection(Vector direction)
     {
         if (direction.getY() * direction.getX() != 0 || Math.abs(direction.getY() + direction.getX()) != 1)
             throw new IllegalArgumentException("Direction module is not 1.");
@@ -66,7 +63,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         this.direction = direction;
     }
 
-    public int Length() {
+    public int length() {
         int result = 1;
         SnakePart cur = this.prev;
         while (cur != null)

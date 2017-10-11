@@ -1,15 +1,16 @@
 package ru.snake_game.Interfaces;
 
-import ru.snake_game.FieldObjects.Apple;
 import ru.snake_game.FieldObjects.SnakeBody;
 import ru.snake_game.util.Vector;
 
 public interface ISnakeHead {
-    Vector GetDirection();
+    Vector getDirection();
 
-    void Kill();
+    void kill();
 
-    SnakeBody Eat(Apple apple);
+    SnakeBody grow();
 
-    void Move();
+    void move();
+
+    int length();
 }

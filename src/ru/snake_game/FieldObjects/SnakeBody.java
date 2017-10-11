@@ -8,12 +8,14 @@ public class SnakeBody extends SnakePart {
     public SnakeBody(Location location, SnakeBody prev, SnakePart next)
     {
         super(location, prev);
+        if (next == null)
+            throw new NullPointerException("Next SnakePart can't be null.");
         this.next = next;
     }
 
     @Override
-    protected void Move() {
+    protected void move() {
         MoveChild();
-        location = next.location;
+        setLocation(next.getLocation());
     }
 }

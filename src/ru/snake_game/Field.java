@@ -42,7 +42,7 @@ public class Field implements IField {
         field.set((width + 1), new SnakeHead(new Location(1,1), null, new Vector(1,0)));
     }
 
-    public AbstractFieldObject FieldObjectAt(Location location)
+    public AbstractFieldObject fieldObjectAt(Location location)
     {
         int index = location.getY() * width + location.getX();
         return field.get(index);
@@ -93,7 +93,7 @@ public class Field implements IField {
             if(newIndex != oldIndex)
             {
                 field.add(newIndex, snakePart);
-                field.add(oldIndex, new Empty(this.GetLocation(oldIndex)));
+                field.add(oldIndex, null);
             }
         }
     }
