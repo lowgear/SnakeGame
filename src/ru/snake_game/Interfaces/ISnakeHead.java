@@ -7,6 +7,8 @@ import ru.snake_game.util.Vector;
 public interface ISnakeHead {
     Vector GetDirection();
 
+    void Kill();
+
     SnakeBody Eat(Location apple);
 
     void Move();

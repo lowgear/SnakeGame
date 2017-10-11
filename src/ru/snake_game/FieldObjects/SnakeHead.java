@@ -9,6 +9,8 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
     private boolean ateRecently = false;
 
+    public boolean isAlive = true;
+
     public SnakeHead(Location location, SnakeBody prev, Vector direction) {
         super(location, prev);
 
@@ -16,6 +18,11 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
             throw new IllegalArgumentException("Direction module is not 1.");
 
         this.direction = direction;
+    }
+
+    public void Kill()
+    {
+        isAlive = false;
     }
 
     public SnakeBody Eat(Location apple)

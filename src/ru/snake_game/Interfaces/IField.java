@@ -4,5 +4,5 @@ import ru.snake_game.FieldObjects.AbstractFieldObject;
 import ru.snake_game.util.Location;
 
 public interface IField {
-    AbstractFieldObject GetTypeFieldObject(Location location);
+    AbstractFieldObject FieldObjectAt(Location location);
 }

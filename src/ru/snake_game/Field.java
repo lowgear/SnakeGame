@@ -1,9 +1,7 @@
 package ru.snake_game;
 
-import ru.snake_game.FieldObjects.SnakeHead;
-import ru.snake_game.FieldObjects.Wall;
+import ru.snake_game.FieldObjects.*;
 import ru.snake_game.Interfaces.IField;
-import ru.snake_game.FieldObjects.AbstractFieldObject;
 import ru.snake_game.util.Location;
 import ru.snake_game.util.Vector;
 
@@ -27,25 +25,76 @@ public class Field implements IField {
     {
         for (int i = 0; i < field.size(); i+=width)
         {
-            field.set(i, new Wall(new Location(0, i % height)));
+            field.set(i, new Wall(this.GetLocation(i)));
         }
         for (int i = width-1; i < field.size(); i+=width)
         {
-            field.set(i, new Wall(new Location(width - 1, (i+1) % height)));
+            field.set(i, new Wall(this.GetLocation(i)));
         }
         for (int i = 1; i < width - 1; i++)
         {
-            field.set(i, new Wall(new Location(i, 0)));
+            field.set(i, new Wall(this.GetLocation(i)));
         }
         for (int i = field.size() - (width - 1); i < field.size() - 1 ; i++)
         {
-            field.set(i, new Wall(new Location(i % width, height - 1)));
+            field.set(i, new Wall(this.GetLocation(i)));
         }
-        field.set((width + 1), new SnakeHead(new Location(1,1), null, new Vector(2,1)));
+        field.set((width + 1), new SnakeHead(new Location(1,1), null, new Vector(1,0)));
     }
 
-    public AbstractFieldObject GetTypeFieldObject(Location location) {
+    public AbstractFieldObject FieldObjectAt(Location location)
+    {
         int index = location.getY() * width + location.getX();
         return field.get(index);
+    }
+
+    public ArrayList<SnakePart> GetSnake()
+    {
+        ArrayList<SnakePart> snake = new ArrayList<>();
+        for (int i = 0; i < field.size(); i++)
+        {
+            if (field.get(i) instanceof SnakeHead)
+                snake.add((SnakeHead)field.get(i));
+            if (field.get(i) instanceof SnakeBody)
+                snake.add((SnakeBody)field.get(i));
+        }
+        return snake;
+    }
+
+    public SnakeHead GetSnakeHead()
+    {
+        SnakeHead snakeHead = null;
+        for (int i = 0; i < field.size(); i++)
+            if (field.get(i) instanceof SnakeHead)
+                snakeHead = (SnakeHead)field.get(i);
+        return snakeHead;
+    }
+
+    public Location GetLocation(int indexInField)
+    {
+        int x = indexInField % width;
+        int y = indexInField / width;
+        return new Location(x, y);
+    }
+
+    public int GetIndexInField(Location location)
+    {
+        return location.getY() * width + location.getX();
+    }
+
+    public void Refresh()
+    {
+        ArrayList<SnakePart> snake = this.GetSnake();
+        for (int i = 0; i < snake.size(); i++)
+        {
+            SnakePart snakePart = snake.get(i);
+            int newIndex = this.GetIndexInField(snakePart.getLocation());
+            int oldIndex = field.indexOf(snakePart);
+            if(newIndex != oldIndex)
+            {
+                field.add(newIndex, snakePart);
+                field.add(oldIndex, new Empty(this.GetLocation(oldIndex)));
+            }
+        }
     }
 }
