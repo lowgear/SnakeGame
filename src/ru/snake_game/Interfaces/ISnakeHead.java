@@ -1,7 +1,7 @@
 package ru.snake_game.Interfaces;
 
+import ru.snake_game.FieldObjects.Apple;
 import ru.snake_game.FieldObjects.SnakeBody;
-import ru.snake_game.util.Location;
 import ru.snake_game.util.Vector;
 
 public interface ISnakeHead {
@@ -9,7 +9,7 @@ public interface ISnakeHead {
 
     void Kill();
 
-    SnakeBody Eat(Location apple);
+    SnakeBody Eat(Apple apple);
 
     void Move();
 }

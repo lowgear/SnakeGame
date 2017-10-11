@@ -15,4 +15,14 @@ public class Vector {
     public int getX() {
         return x;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Vector)
+        {
+            Vector vec = (Vector) obj;
+            return vec.x == x && vec.y == y;
+        }
+        return false;
+    }
 }

@@ -32,7 +32,7 @@ public class Game implements IGame {
         {
             if (directionObject instanceof Apple)
             {
-                SnakeBody newPart = snakeHead.Eat(directionObject.getLocation());
+                SnakeBody newPart = snakeHead.Eat((Apple)directionObject);
                 field.field.add(field.GetIndexInField(objectLocation), snakeHead);
                 field.field.add(field.GetIndexInField(snakeHead.getLocation()), newPart);
             }

@@ -21,4 +21,14 @@ public class Location {
     {
         return new Location(x + move.getX(), y + move.getY());
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Location)
+        {
+            Location loc = (Location)obj;
+            return loc.x == x && loc.y == y;
+        }
+        return false;
+    }
 }

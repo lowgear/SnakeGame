@@ -15,10 +15,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
     public SnakeHead(Location location, SnakeBody prev, Vector direction) {
         super(location, prev);
 
-        if (direction.getY() * direction.getX() != 0 || Math.abs(direction.getY() + direction.getX()) != 1)
-            throw new IllegalArgumentException("Direction module is not 1.");
-
-        this.direction = direction;
+        SetDirection(direction);
     }
 
     public void Kill()
@@ -31,12 +28,15 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         return isAlive;
     }
 
-    public SnakeBody Eat(Location apple)
+    public SnakeBody Eat(Apple apple) throws NullPointerException, IllegalStateException
     {
+        if (apple == null)
+            throw new NullPointerException("Apple cant be null.");
         if (!IsAlive())
             throw new IllegalStateException("Dead snake can't eat.");
         SnakeBody t = new SnakeBody(location, prev, this);
-        prev.next = t;
+        if (prev != null)
+            prev.next = t;
         prev = t;
         ateRecently = true;
         return t;
@@ -56,5 +56,24 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         if (!IsAlive())
             return noDirection;
         return direction;
+    }
+
+    public void SetDirection(Vector direction)
+    {
+        if (direction.getY() * direction.getX() != 0 || Math.abs(direction.getY() + direction.getX()) != 1)
+            throw new IllegalArgumentException("Direction module is not 1.");
+
+        this.direction = direction;
+    }
+
+    public int Length() {
+        int result = 1;
+        SnakePart cur = this.prev;
+        while (cur != null)
+        {
+            cur = cur.prev;
+            result++;
+        }
+        return result;
     }
 }
