@@ -9,7 +9,8 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
     private boolean ateRecently = false;
 
-    public boolean isAlive = true;
+    private boolean isAlive = true;
+    private final static Vector noDirection = new Vector(0, 0);
 
     public SnakeHead(Location location, SnakeBody prev, Vector direction) {
         super(location, prev);
@@ -25,8 +26,15 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         isAlive = false;
     }
 
+    public boolean IsAlive()
+    {
+        return isAlive;
+    }
+
     public SnakeBody Eat(Location apple)
     {
+        if (!IsAlive())
+            throw new IllegalStateException("Dead snake can't eat.");
         SnakeBody t = new SnakeBody(location, prev, this);
         prev.next = t;
         prev = t;
@@ -35,6 +43,8 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
     }
 
     public void Move() {
+        if (!IsAlive())
+            return;
         if (!ateRecently)
             MoveChild();
         else
@@ -43,6 +53,8 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
     }
 
     public Vector GetDirection() {
+        if (!IsAlive())
+            return noDirection;
         return direction;
     }
 }
