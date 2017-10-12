@@ -6,5 +6,7 @@ public interface IFieldObject
 {
     Location getLocation();
 
-    Iterable<IFieldObject> snakeInteract(ISnakeHead snake);
+    void snakeInteract(ISnakeHead snake);
+
+    IField getField();
 }

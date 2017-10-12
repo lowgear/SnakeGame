@@ -1,100 +1,113 @@
 package ru.snake_game;
 
-import ru.snake_game.FieldObjects.*;
+import ru.snake_game.FieldObjects.SnakeBody;
+import ru.snake_game.FieldObjects.SnakeHead;
+import ru.snake_game.FieldObjects.SnakePart;
+import ru.snake_game.FieldObjects.Wall;
 import ru.snake_game.Interfaces.IField;
+import ru.snake_game.Interfaces.IFieldObject;
+import ru.snake_game.Interfaces.ISnakeHead;
 import ru.snake_game.util.Location;
 import ru.snake_game.util.Vector;
 
 import java.util.ArrayList;
 
 public class Field implements IField {
-    public ArrayList<AbstractFieldObject> field;
-    public int height;
-    public int width;
+    private ArrayList<IFieldObject> field;
+    private int height;
+    private int width;
 
-    Field(int height, int width) throws Exception
-    {
-        if (height < 0 || width < 0)
+    Field(int height, int width) throws Exception {
+        if (height < 1 || width < 1)
             throw new Exception("Field can`t to be built, incorrect parameters");
         this.height = height;
         this.width = width;
-        field =  new ArrayList<>(height*width);
+        field = new ArrayList<>(height * width);
     }
 
-    public void CreateField()
-    {
-        for (int i = 0; i < field.size(); i+=width)
-        {
-            field.set(i, new Wall(this.GetLocation(i)));
-        }
-        for (int i = width-1; i < field.size(); i+=width)
-        {
-            field.set(i, new Wall(this.GetLocation(i)));
-        }
-        for (int i = 1; i < width - 1; i++)
-        {
-            field.set(i, new Wall(this.GetLocation(i)));
-        }
-        for (int i = field.size() - (width - 1); i < field.size() - 1 ; i++)
-        {
-            field.set(i, new Wall(this.GetLocation(i)));
-        }
-        field.set((width + 1), new SnakeHead(new Location(1,1), null, new Vector(1,0)));
-    }
-
-    public AbstractFieldObject fieldObjectAt(Location location)
-    {
-        int index = location.getY() * width + location.getX();
+    public IFieldObject getObjectAt(int x, int y) {
+        int index = y * width + x;
         return field.get(index);
     }
 
-    public ArrayList<SnakePart> GetSnake()
-    {
+    public IFieldObject getObjectAt(Location location) {
+        return getObjectAt(location.getX(), location.getY());
+    }
+
+    public void setObjectAt(int x, int y, IFieldObject object) {
+        field.set(getIndexInField(x, y), object);
+    }
+
+    public void setObjectAt(Location location, IFieldObject object) {
+        setObjectAt(location.getX(), location.getY(), object);
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public ISnakeHead getSnakeHead() {
+        SnakeHead snakeHead = null;
+        for (IFieldObject fieldObject : field)
+            if (fieldObject instanceof SnakeHead)
+                snakeHead = (SnakeHead) fieldObject;
+        return snakeHead;
+    }
+
+    public ArrayList<SnakePart> getSnake() {
         ArrayList<SnakePart> snake = new ArrayList<>();
-        for (int i = 0; i < field.size(); i++)
-        {
-            if (field.get(i) instanceof SnakeHead)
-                snake.add((SnakeHead)field.get(i));
-            if (field.get(i) instanceof SnakeBody)
-                snake.add((SnakeBody)field.get(i));
+        for (IFieldObject fieldObject : field) {
+            if (fieldObject instanceof SnakeHead)
+                snake.add((SnakeHead) fieldObject);
+            if (fieldObject instanceof SnakeBody)
+                snake.add((SnakeBody) fieldObject);
         }
         return snake;
     }
 
-    public SnakeHead GetSnakeHead()
-    {
-        SnakeHead snakeHead = null;
-        for (int i = 0; i < field.size(); i++)
-            if (field.get(i) instanceof SnakeHead)
-                snakeHead = (SnakeHead)field.get(i);
-        return snakeHead;
-    }
-
-    public Location GetLocation(int indexInField)
-    {
+    private Location getLocation(int indexInField) {
         int x = indexInField % width;
         int y = indexInField / width;
         return new Location(x, y);
     }
 
-    public int GetIndexInField(Location location)
-    {
-        return location.getY() * width + location.getX();
+    private int getIndexInField(Location location) {
+        return getIndexInField(location.getX(), location.getY());
     }
 
-    public void Refresh()
-    {
-        ArrayList<SnakePart> snake = this.GetSnake();
-        for (int i = 0; i < snake.size(); i++)
-        {
-            SnakePart snakePart = snake.get(i);
-            int newIndex = this.GetIndexInField(snakePart.getLocation());
+    private int getIndexInField(int x, int y) {
+        return y * width + x;
+    }
+
+    public void refresh() {
+        ArrayList<SnakePart> snake = this.getSnake();
+        for (SnakePart snakePart : snake) {
+            int newIndex = this.getIndexInField(snakePart.getLocation());
             int oldIndex = field.indexOf(snakePart);
-            if(newIndex != oldIndex)
-            {
+            if (newIndex != oldIndex) {
                 field.add(newIndex, snakePart);
                 field.add(oldIndex, null);
             }
         }
+    }
+
+    public void createField() {
+        for (int i = 0; i < field.size(); i += width) {
+            field.set(i, new Wall(this.getLocation(i)));
+        }
+        for (int i = width - 1; i < field.size(); i += width) {
+            field.set(i, new Wall(this.getLocation(i)));
+        }
+        for (int i = 1; i < width - 1; i++) {
+            field.set(i, new Wall(this.getLocation(i)));
+        }
+        for (int i = field.size() - (width - 1); i < field.size() - 1; i++) {
+            field.set(i, new Wall(this.getLocation(i)));
+        }
+        field.set((width + 1), new SnakeHead(new Location(1, 1), null, new Vector(1, 0)));
     }
 }

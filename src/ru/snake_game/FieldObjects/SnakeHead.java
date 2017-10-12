@@ -1,5 +1,6 @@
 package ru.snake_game.FieldObjects;
 
+import ru.snake_game.Interfaces.IField;
 import ru.snake_game.Interfaces.ISnakeHead;
 import ru.snake_game.util.Location;
 import ru.snake_game.util.Vector;
@@ -11,8 +12,8 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
     private boolean alive = true;
 
-    public SnakeHead(Location location, SnakeBody prev, Vector direction) {
-        super(location, prev);
+    public SnakeHead(Location location, SnakeBody prev, Vector direction, IField field) {
+        super(location, prev, field);
 
         setDirection(direction);
     }
@@ -27,25 +28,29 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         return alive;
     }
 
-    public SnakeBody grow() throws IllegalStateException
+    public void grow() throws IllegalStateException
     {
         if (!isAlive())
             throw new IllegalStateException("Dead snake can't grow.");
-        SnakeBody t = new SnakeBody(getLocation(), prev, this);
-        if (prev != null)
-            prev.next = t;
-        prev = t;
+
         ateRecently = true;
-        return t;
     }
 
     public void move() {
         if (!isAlive())
             return;
-        if (!ateRecently)
-            MoveChild();
-        else
+        if (ateRecently) {
+            SnakePart tail = getTail();
+            //remember tail's location before movement
+            SnakeBody t = new SnakeBody(tail.getLocation(), null, tail);
             ateRecently = false;
+            moveChild();
+            tail.prev = t;
+            //place new segment where the tail was
+            getField().setObjectAt(t.getLocation(), t);
+        } else
+            moveChild();
+
         setLocation(getLocation().Moved(direction));
     }
 
@@ -72,5 +77,12 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
             result++;
         }
         return result;
+    }
+
+    private SnakePart getTail() {
+        SnakePart cur = this;
+        while (cur.prev != null)
+            cur = cur.prev;
+        return cur;
     }
 }
