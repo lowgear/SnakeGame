@@ -9,8 +9,9 @@ import ru.snake_game.Interfaces.ISnakeHead;
 import ru.snake_game.util.Location;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class Field implements IField {
+public class Field implements IField, Iterable<IFieldObject> {
     private ArrayList<IFieldObject> field;
     private int height;
     private int width;
@@ -84,15 +85,8 @@ public class Field implements IField {
         return y * width + x;
     }
 
-    public void refresh() {
-        ArrayList<SnakePart> snake = this.getSnake();
-        for (SnakePart snakePart : snake) {
-            int newIndex = this.getIndexInField(snakePart.getLocation());
-            int oldIndex = field.indexOf(snakePart);
-            if (newIndex != oldIndex) {
-                field.add(newIndex, snakePart);
-                field.add(oldIndex, null);
-            }
-        }
+    @Override
+    public Iterator<IFieldObject> iterator() {
+        return field.iterator();
     }
 }

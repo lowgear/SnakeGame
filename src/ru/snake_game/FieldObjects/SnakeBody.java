@@ -4,23 +4,25 @@ import ru.snake_game.Interfaces.ISnakeHead;
 import ru.snake_game.util.Location;
 
 public class SnakeBody extends SnakePart {
+    private final ISnakeHead head;
     protected SnakePart next;
 
-    public SnakeBody(Location location, SnakeBody prev, SnakePart next)
+    public SnakeBody(Location location, ISnakeHead head, SnakeBody prev, SnakePart next)
     {
         super(location, prev, next.getField());
         this.next = next;
+        this.head = head;
     }
 
     @Override
     protected void move() {
         moveChild();
         setLocation(next.getLocation());
+        getField().setObjectAt(getLocation(), this);
     }
 
     @Override
-    public void snakeInteract(ISnakeHead snakeHead) {
-        if (prev != null)
-            super.snakeInteract(snakeHead);
+    protected ISnakeHead getHead() {
+        return head;
     }
 }

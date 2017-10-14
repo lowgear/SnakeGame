@@ -21,14 +21,16 @@ abstract public class AbstractFieldObject implements IFieldObject {
         this.setLocation(location);
     }
 
-    protected void setLocation(Location location){
+    protected void setLocation(Location location) {
         if (location == null)
             throw new IllegalArgumentException("Location can'n be null.");
         this.location = location;
     }
 
-    @Override
     public IField getField() {
         return field;
+    }
+
+    public void act() {
     }
 }

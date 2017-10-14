@@ -1,6 +1,7 @@
 package ru.snake_game.FieldObjects;
 
 import ru.snake_game.Interfaces.IField;
+import ru.snake_game.Interfaces.IFieldObject;
 import ru.snake_game.Interfaces.ISnakeHead;
 import ru.snake_game.util.Location;
 import ru.snake_game.util.Vector;
@@ -8,9 +9,10 @@ import ru.snake_game.util.Vector;
 public class SnakeHead extends SnakePart implements ISnakeHead {
     private Vector direction;
 
-    private boolean ateRecently = false;
+    private int lengthToGrow = 0;
 
     private boolean alive = true;
+    private boolean justAte;
 
     public SnakeHead(Location location, SnakeBody prev, Vector direction, IField field) {
         super(location, prev, field);
@@ -18,40 +20,52 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         setDirection(direction);
     }
 
-    public void kill()
-    {
+    public void kill() {
         alive = false;
     }
 
-    public boolean isAlive()
-    {
+    public boolean isAlive() {
         return alive;
     }
 
-    public void grow() throws IllegalStateException
-    {
-        if (!isAlive())
-            throw new IllegalStateException("Dead snake can't grow.");
-
-        ateRecently = true;
+    public boolean willGrow() {
+        return lengthToGrow > 0;
     }
 
-    public void move() {
+    public void eat(int growValue) throws IllegalStateException {
+        if (!isAlive())
+            throw new IllegalStateException("Dead snake can't eat.");
+        if (growValue < 1)
+            throw new IllegalArgumentException("growValue should be positive.");
+
+        if (lengthToGrow == 0)
+            justAte = true;
+        lengthToGrow += growValue;
+    }
+
+    protected void move() {
         if (!isAlive())
             return;
-        if (ateRecently) {
+        if (lengthToGrow > 0 && !justAte) {
             SnakePart tail = getTail();
-            //remember tail's location before movement
-            SnakeBody t = new SnakeBody(tail.getLocation(), null, tail);
-            ateRecently = false;
+
+            Location t = tail.getLocation();
             moveChild();
-            tail.prev = t;
-            //place new segment where the tail was
-            getField().setObjectAt(t.getLocation(), t);
+            tail.prev = new SnakeBody(tail.getLocation(), this, null, tail);
+            lengthToGrow--;
+
+            getField().setObjectAt(t, tail.prev);
         } else
             moveChild();
 
-        setLocation(getLocation().Moved(direction));
+        setLocation(getLocation().moved(direction));
+        getField().setObjectAt(getLocation(), this);
+        justAte = false;
+    }
+
+    @Override
+    protected ISnakeHead getHead() {
+        return this;
     }
 
     public Vector getDirection() {
@@ -60,19 +74,18 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         return direction;
     }
 
-    public void setDirection(Vector direction)
-    {
+    public void setDirection(Vector direction) {
         if (direction.getY() * direction.getX() != 0 || Math.abs(direction.getY() + direction.getX()) != 1)
             throw new IllegalArgumentException("Direction module is not 1.");
 
-        this.direction = direction;
+        if (prev == null || prev.getLocation() != getLocation().moved(direction))
+            this.direction = direction;
     }
 
     public int length() {
         int result = 1;
         SnakePart cur = this.prev;
-        while (cur != null)
-        {
+        while (cur != null) {
             cur = cur.prev;
             result++;
         }
@@ -84,5 +97,13 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         while (cur.prev != null)
             cur = cur.prev;
         return cur;
+    }
+
+    @Override
+    public void act() {
+        IFieldObject directionObject = getField().getObjectAt(getLocation().moved(direction));
+        if (directionObject != null)
+            directionObject.snakeInteract(this);
+        move();
     }
 }

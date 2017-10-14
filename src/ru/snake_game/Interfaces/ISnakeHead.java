@@ -9,11 +9,11 @@ public interface ISnakeHead extends IFieldObject {
 
     void kill();
 
-    void grow();
-
-    void move();
+    void eat(int growValue);
 
     int length();
 
     boolean isAlive();
+
+    boolean willGrow();
 }

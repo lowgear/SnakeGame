@@ -1,6 +1,7 @@
 package ru.snake_game.FieldObjects;
 
 import ru.snake_game.Interfaces.IField;
+import ru.snake_game.Interfaces.ISnakeHead;
 import ru.snake_game.util.Location;
 
 public abstract class SnakePart extends AbstractSolidFieldObject {
@@ -18,4 +19,12 @@ public abstract class SnakePart extends AbstractSolidFieldObject {
         if (prev != null)
             prev.move();
     }
+
+    @Override
+    public void snakeInteract(ISnakeHead snakeHead) {
+        if (prev != null || getHead().willGrow())
+            snakeHead.kill();
+    }
+
+    protected abstract ISnakeHead getHead();
 }

@@ -17,7 +17,7 @@ public class Location {
         return y;
     }
 
-    public Location Moved(Vector move)
+    public Location moved(Vector move)
     {
         return new Location(x + move.getX(), y + move.getY());
     }
