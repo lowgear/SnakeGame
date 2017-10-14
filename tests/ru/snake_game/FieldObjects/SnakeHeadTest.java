@@ -10,11 +10,11 @@ import static org.junit.Assert.*;
 
 public class SnakeHeadTest {
     private SnakeHead snake;
-    private Apple apple = new Apple(new Location(-1, -1));
+    //private Apple apple = new Apple(new Location(-1, -1));
 
     @Before
     public void setUp() throws Exception {
-        snake = new SnakeHead(new Location(0, 0), null, new Vector(0, 1));
+        //  snake = new SnakeHead(new Location(0, 0), null, new Vector(0, 1));
     }
 
     @After

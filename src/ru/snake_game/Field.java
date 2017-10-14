@@ -3,12 +3,10 @@ package ru.snake_game;
 import ru.snake_game.FieldObjects.SnakeBody;
 import ru.snake_game.FieldObjects.SnakeHead;
 import ru.snake_game.FieldObjects.SnakePart;
-import ru.snake_game.FieldObjects.Wall;
 import ru.snake_game.Interfaces.IField;
 import ru.snake_game.Interfaces.IFieldObject;
 import ru.snake_game.Interfaces.ISnakeHead;
 import ru.snake_game.util.Location;
-import ru.snake_game.util.Vector;
 
 import java.util.ArrayList;
 
@@ -22,7 +20,10 @@ public class Field implements IField {
             throw new Exception("Field can`t to be built, incorrect parameters");
         this.height = height;
         this.width = width;
-        field = new ArrayList<>(height * width);
+        int n = width * height;
+        field = new ArrayList<>(n);
+        for (int i = 0; i < n; i++)
+            field.add(null);
     }
 
     public IFieldObject getObjectAt(int x, int y) {
@@ -93,21 +94,5 @@ public class Field implements IField {
                 field.add(oldIndex, null);
             }
         }
-    }
-
-    public void createField() {
-        for (int i = 0; i < field.size(); i += width) {
-            field.set(i, new Wall(this.getLocation(i)));
-        }
-        for (int i = width - 1; i < field.size(); i += width) {
-            field.set(i, new Wall(this.getLocation(i)));
-        }
-        for (int i = 1; i < width - 1; i++) {
-            field.set(i, new Wall(this.getLocation(i)));
-        }
-        for (int i = field.size() - (width - 1); i < field.size() - 1; i++) {
-            field.set(i, new Wall(this.getLocation(i)));
-        }
-        field.set((width + 1), new SnakeHead(new Location(1, 1), null, new Vector(1, 0)));
     }
 }
