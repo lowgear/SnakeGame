@@ -42,14 +42,14 @@ public class SnakeHeadTest {
 
     @Test
     public void lengthAfterGrow() throws Exception {
-        snake.eat();
+        snake.eat(1);
         assertEquals(2, snake.length());
         assertEquals(2, snake.length());
     }
 
     @Test
     public void moveEat() throws Exception {
-        snake.eat();
+        snake.eat(1);
         snake.move();
         assertEquals(new Location(0, 1), snake.getLocation());
         assertEquals(new Location(0, 0), snake.prev.getLocation());
@@ -57,10 +57,10 @@ public class SnakeHeadTest {
 
     @Test
     public void moveEatTurn() throws Exception {
-        snake.eat();
+        snake.eat(1);
         snake.move();
         snake.setDirection(new Vector(1, 0));
-        snake.eat();
+        snake.eat(1);
         snake.move();
         assertEquals(new Location(1, 1), snake.getLocation());
         assertEquals(new Location(0, 1), snake.prev.getLocation());

@@ -52,6 +52,10 @@ public class Field implements IField, Iterable<IFieldObject> {
         return height;
     }
 
+    public int size() {
+        return field.size();
+    }
+
     public ISnakeHead getSnakeHead() {
         SnakeHead snakeHead = null;
         for (IFieldObject fieldObject : field)
@@ -71,7 +75,7 @@ public class Field implements IField, Iterable<IFieldObject> {
         return snake;
     }
 
-    private Location getLocation(int indexInField) {
+    public Location getLocation(int indexInField) {
         int x = indexInField % width;
         int y = indexInField / width;
         return new Location(x, y);
