@@ -51,7 +51,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
             Location t = tail.getLocation();
             moveChild();
-            tail.prev = new SnakeBody(tail.getLocation(), this, null, tail);
+            tail.prev = new SnakeBody(t, this, null, tail);
             lengthToGrow--;
 
             getField().setObjectAt(t, tail.prev);

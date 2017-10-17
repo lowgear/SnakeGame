@@ -4,6 +4,8 @@ import ru.snake_game.Interfaces.IField;
 import ru.snake_game.Interfaces.IFieldObject;
 import ru.snake_game.Interfaces.IGame;
 
+import java.util.HashSet;
+
 public class Game implements IGame {
     private IField field;
 
@@ -14,8 +16,12 @@ public class Game implements IGame {
 
     public void tick() throws IllegalStateException
     {
+        HashSet<IFieldObject> objectsWhichActed = new HashSet<>();
         for (IFieldObject object : field) {
-            object.act();
+            if (object != null && !objectsWhichActed.contains(object)) {
+                objectsWhichActed.add(object);
+                object.act();
+            }
         }
     }
 
