@@ -79,17 +79,9 @@ public class FieldTest {
     }
 
     @Test
-    public void getLocation() throws Exception {
-        assertEquals(new Location(3, 2), field.getLocation(15));
-        assertEquals(new Location(0,3), field.getLocation(18));
-        assertEquals(new Location(2, 0), field.getLocation(2));
-    }
-
-    @Test
     public void iterator() throws Exception {
         int size = 0;
         for (IFieldObject object : field){
-            assertTrue(object instanceof IFieldObject);
             size += 1;
         }
         assertEquals(4 * 4, size);

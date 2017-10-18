@@ -64,27 +64,6 @@ public class Field implements IField, Iterable<IFieldObject> {
         return snakeHead;
     }
 
-    public ArrayList<SnakePart> getSnake() {
-        ArrayList<SnakePart> snake = new ArrayList<>();
-        for (IFieldObject fieldObject : field) {
-            if (fieldObject instanceof SnakeHead)
-                snake.add((SnakeHead) fieldObject);
-            if (fieldObject instanceof SnakeBody)
-                snake.add((SnakeBody) fieldObject);
-        }
-        return snake;
-    }
-
-    public Location getLocation(int indexInField) {
-        int x = indexInField % width;
-        int y = indexInField / width;
-        return new Location(x, y);
-    }
-
-    private int getIndexInField(Location location) {
-        return getIndexInField(location.getX(), location.getY());
-    }
-
     private int getIndexInField(int x, int y) {
         return y * width + x;
     }

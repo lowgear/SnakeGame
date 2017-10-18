@@ -19,21 +19,18 @@ public class GameTest {
     public void setUp() throws Exception {
         field = new Field(6,6);
         int width = field.getWidth();
-        for (int i = 0; i < field.size(); i+=width) {
-            Location location = field.getLocation(i);
+        int height = field.getHeight();
+        for (int y = 0; y < height; y += 1) {
+            Location location = new Location(0, y);
+            field.setObjectAt(location, new Wall(location, field));
+            location = new Location(width - 1, y);
             field.setObjectAt(location, new Wall(location, field));
         }
-        for (int i = width-1; i < field.size(); i+=width) {
-            Location location = field.getLocation(i);
+        for (int x = 1; x < width - 1; x++) {
+            Location location = new Location(x, 0);
             field.setObjectAt(location, new Wall(location, field));
-        }
-        for (int i = 1; i < width - 1; i++) {
-            Location location = field.getLocation(i);
+            location = new Location(x, height - 1);
             field.setObjectAt(location, new Wall(location, field));
-        }
-        for (int i = field.size() - (width - 1); i < field.size() - 1 ; i++) {
-            Location location = field.getLocation(i);
-            field.setObjectAt(location, new Wall(location,field));
         }
 
         game = new Game(field);
@@ -48,9 +45,9 @@ public class GameTest {
     @Test
     public void tick() throws Exception {
         int width = field.getWidth();
-        Location location = field.getLocation(width + 1);
+        Location location = new Location(1,1);
         field.setObjectAt(location, new SnakeHead(location, null, new Vector(1,0), field));
-        location = field.getLocation(2 * width + 3);
+        location = new Location(3, 2);
         field.setObjectAt(location, new Apple(location, field, 2));
         SnakeHead snakeHead = (SnakeHead) field.getSnakeHead();
 
@@ -66,19 +63,20 @@ public class GameTest {
         game.tick();
 
         assertFalse(snakeHead.isAlive());
-        assertTrue(field.getObjectAt(field.getLocation(4 * width)) instanceof Wall);
-        assertNull(field.getObjectAt(field.getLocation(2 * width + 3)));
-        assertEquals(field.getLocation(4 * width + 1), snakeHead.getLocation());
+        assertTrue(field.getObjectAt(new Location(0,4)) instanceof Wall);
+        assertNull(field.getObjectAt(new Location(3, 2)));
+        assertEquals(new Location(1,4), snakeHead.getLocation());
         assertEquals(3, snakeHead.length());
     }
 
     @Test
     public void cycleTick() throws Exception{
         int width = field.getWidth();
-        Location location = field.getLocation(width + 1);
+        Location location = new Location(1,1);
         SnakeHead snakeHead = new SnakeHead(location, null, new Vector(1,0), field);
         field.setObjectAt(location, snakeHead);
-        field.setObjectAt(field.getLocation(width + 2), new Apple(location, field, 11));
+        location  = new Location(2,1);
+        field.setObjectAt(location, new Apple(location, field, 11));
 
         ArrayList<Vector> vectors = new ArrayList<>();
         vectors.add(new Vector(0,1));
