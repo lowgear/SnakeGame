@@ -20,6 +20,18 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         setDirection(direction);
     }
 
+    public SnakeHead(Location location, Vector direction, IField field, Iterable<Location> bodyLocation) {
+        super(location, null, field);
+        setDirection(direction);
+
+        SnakePart tail = this;
+        for (Location partLocation : bodyLocation) {
+            tail.prev = new SnakeBody(partLocation, this, null, tail);
+            field.setObjectAt(partLocation, tail.prev);
+            tail = tail.prev;
+        }
+    }
+
     public void kill() {
         alive = false;
     }
