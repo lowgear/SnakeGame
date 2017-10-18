@@ -28,7 +28,7 @@ public class Field implements IField, Iterable<IFieldObject> {
     }
 
     public IFieldObject getObjectAt(int x, int y) {
-        int index = y * width + x;
+        int index = getIndexInField(x, y);
         return field.get(index);
     }
 
