@@ -9,7 +9,7 @@ public class SnakeBody extends SnakePart {
 
     public SnakeBody(Location location, ISnakeHead head, SnakeBody prev, SnakePart next)
     {
-        super(location, prev, next.getField());
+        super(location, prev, next.field);
         this.next = next;
         this.head = head;
     }
@@ -18,7 +18,7 @@ public class SnakeBody extends SnakePart {
     protected void move() {
         moveChild();
         setLocation(next.getLocation());
-        getField().setObjectAt(getLocation(), this);
+        field.setObjectAt(getLocation(), this);
     }
 
     @Override

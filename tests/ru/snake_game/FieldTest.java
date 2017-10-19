@@ -1,17 +1,13 @@
 package ru.snake_game;
 
-import javafx.util.converter.LocalDateStringConverter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import ru.snake_game.FieldObjects.AbstractFieldObject;
 import ru.snake_game.FieldObjects.SnakeHead;
 import ru.snake_game.FieldObjects.Wall;
 import ru.snake_game.Interfaces.IFieldObject;
 import ru.snake_game.util.Location;
 import ru.snake_game.util.Vector;
-
-import java.util.Locale;
 
 import static org.junit.Assert.*;
 
@@ -64,11 +60,6 @@ public class FieldTest {
     @Test
     public void getHeight() throws Exception {
         assertEquals(4, field.getHeight());
-    }
-
-    @Test
-    public void size() throws Exception {
-       assertEquals(4 * 4, field.size());
     }
 
     @Test

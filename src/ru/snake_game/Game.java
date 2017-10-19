@@ -9,12 +9,13 @@ import java.util.HashSet;
 public class Game implements IGame {
     private IField field;
 
-    Game(IField field) throws Exception
+    public Game(IField field)
     {
         this.field = field;
     }
 
-    public void tick() throws IllegalStateException
+    @Override
+    public void tick()
     {
         HashSet<IFieldObject> objectsWhichActed = new HashSet<>();
         for (IFieldObject object : field) {
@@ -25,6 +26,7 @@ public class Game implements IGame {
         }
     }
 
+    @Override
     public IField getField() {
         return field;
     }

@@ -1,15 +1,22 @@
 package ru.snake_game.FieldObjects;
 
+import com.sun.istack.internal.NotNull;
 import ru.snake_game.Interfaces.IField;
 import ru.snake_game.Interfaces.ISnakeHead;
 import ru.snake_game.util.Location;
 
 public abstract class SnakePart extends AbstractSolidFieldObject {
     protected SnakeBody prev;
+    protected IField field;
 
-    protected SnakePart(Location location, SnakeBody prev, IField field) {
-        super(location, field);
+    protected SnakePart(@NotNull Location location, @NotNull SnakeBody prev, @NotNull IField field) {
+        super(location);
+
+        if (field == null)
+            throw new IllegalArgumentException("field can't be null.");
+
         this.prev = prev;
+        this.field = field;
     }
 
     protected abstract void move();
@@ -19,7 +26,7 @@ public abstract class SnakePart extends AbstractSolidFieldObject {
         if (prev != null)
             prev.move();
         else
-            this.getField().setObjectAt(this.getLocation(), null);
+            field.setObjectAt(this.getLocation(), null);
     }
 
     @Override

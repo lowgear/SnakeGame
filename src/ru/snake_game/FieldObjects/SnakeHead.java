@@ -32,18 +32,22 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         }
     }
 
+    @Override
     public void kill() {
         alive = false;
     }
 
+    @Override
     public boolean isAlive() {
         return alive;
     }
 
+    @Override
     public boolean willGrow() {
         return lengthToGrow > 0;
     }
 
+    @Override
     public void eat(int growValue) throws IllegalStateException {
         if (!isAlive())
             throw new IllegalStateException("Dead snake can't eat.");
@@ -55,6 +59,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         lengthToGrow += growValue;
     }
 
+    @Override
     protected void move() {
         if (!isAlive())
             return;
@@ -66,12 +71,12 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
             tail.prev = new SnakeBody(t, this, null, tail);
             lengthToGrow--;
 
-            getField().setObjectAt(t, tail.prev);
+            field.setObjectAt(t, tail.prev);
         } else
             moveChild();
 
         setLocation(getLocation().moved(direction));
-        getField().setObjectAt(getLocation(), this);
+        field.setObjectAt(getLocation(), this);
         justAte = false;
     }
 
@@ -80,12 +85,14 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         return this;
     }
 
+    @Override
     public Vector getDirection() {
         if (!isAlive())
             return Vector.ZERO;
         return direction;
     }
 
+    @Override
     public void setDirection(Vector direction) {
         if (direction.getY() * direction.getX() != 0 || Math.abs(direction.getY() + direction.getX()) != 1)
             throw new IllegalArgumentException("Direction module is not 1.");
@@ -94,6 +101,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
             this.direction = direction;
     }
 
+    @Override
     public int length() {
         int result = 1;
         SnakePart cur = this.prev;
@@ -113,7 +121,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
     @Override
     public void act() {
-        IFieldObject directionObject = getField().getObjectAt(getLocation().moved(direction));
+        IFieldObject directionObject = field.getObjectAt(getLocation().moved(direction));
         if (directionObject != null)
             directionObject.snakeInteract(this);
         move();

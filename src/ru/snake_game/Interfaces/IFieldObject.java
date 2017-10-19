@@ -8,7 +8,5 @@ public interface IFieldObject
 
     void snakeInteract(ISnakeHead snake);
 
-    IField getField();
-
     void act();
 }

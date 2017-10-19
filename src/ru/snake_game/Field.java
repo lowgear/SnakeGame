@@ -1,8 +1,7 @@
 package ru.snake_game;
 
-import ru.snake_game.FieldObjects.SnakeBody;
+import org.jetbrains.annotations.NotNull;
 import ru.snake_game.FieldObjects.SnakeHead;
-import ru.snake_game.FieldObjects.SnakePart;
 import ru.snake_game.Interfaces.IField;
 import ru.snake_game.Interfaces.IFieldObject;
 import ru.snake_game.Interfaces.ISnakeHead;
@@ -16,7 +15,7 @@ public class Field implements IField, Iterable<IFieldObject> {
     private int height;
     private int width;
 
-    Field(int height, int width) throws Exception {
+    public Field(int height, int width) throws Exception {
         if (height < 1 || width < 1)
             throw new Exception("Field can`t to be built, incorrect parameters");
         this.height = height;
@@ -27,35 +26,38 @@ public class Field implements IField, Iterable<IFieldObject> {
             field.add(null);
     }
 
+    @Override
     public IFieldObject getObjectAt(int x, int y) {
         int index = getIndexInField(x, y);
         return field.get(index);
     }
 
+    @Override
     public IFieldObject getObjectAt(Location location) {
         return getObjectAt(location.getX(), location.getY());
     }
 
+    @Override
     public void setObjectAt(int x, int y, IFieldObject object) {
         field.set(getIndexInField(x, y), object);
     }
 
+    @Override
     public void setObjectAt(Location location, IFieldObject object) {
         setObjectAt(location.getX(), location.getY(), object);
     }
 
+    @Override
     public int getWidth() {
         return width;
     }
 
+    @Override
     public int getHeight() {
         return height;
     }
 
-    public int size() {
-        return field.size();
-    }
-
+    @Override
     public ISnakeHead getSnakeHead() {
         SnakeHead snakeHead = null;
         for (IFieldObject fieldObject : field)
@@ -68,6 +70,7 @@ public class Field implements IField, Iterable<IFieldObject> {
         return y * width + x;
     }
 
+    @NotNull
     @Override
     public Iterator<IFieldObject> iterator() {
         return field.iterator();
