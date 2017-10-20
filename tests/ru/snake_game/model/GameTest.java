@@ -46,7 +46,6 @@ public class GameTest {
 
     @Test
     public void tick() throws Exception {
-        int width = field.getWidth();
         Location location = new Location(1,1);
         field.setObjectAt(location, new SnakeHead(location, null, new Vector(1,0), field));
         location = new Location(3, 2);
@@ -73,7 +72,6 @@ public class GameTest {
 
     @Test
     public void cycleTick() throws Exception{
-        int width = field.getWidth();
         Location location = new Location(1,1);
         SnakeHead snakeHead = new SnakeHead(location, null, new Vector(1,0), field);
         field.setObjectAt(location, snakeHead);
