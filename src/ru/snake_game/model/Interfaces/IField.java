@@ -1,6 +1,6 @@
-package ru.snake_game.Interfaces;
+package ru.snake_game.model.Interfaces;
 
-import ru.snake_game.util.Location;
+import ru.snake_game.model.util.Location;
 
 public interface IField extends Iterable<IFieldObject> {
     int getWidth();

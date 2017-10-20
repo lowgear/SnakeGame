@@ -1,4 +1,4 @@
-package ru.snake_game.Interfaces;
+package ru.snake_game.model.Interfaces;
 
 public interface IGame{
     void tick() throws  Exception;

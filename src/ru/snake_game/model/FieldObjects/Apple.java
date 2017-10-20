@@ -1,8 +1,8 @@
-package ru.snake_game.FieldObjects;
+package ru.snake_game.model.FieldObjects;
 
-import ru.snake_game.Interfaces.IField;
-import ru.snake_game.Interfaces.ISnakeHead;
-import ru.snake_game.util.Location;
+import ru.snake_game.model.Interfaces.IField;
+import ru.snake_game.model.Interfaces.ISnakeHead;
+import ru.snake_game.model.util.Location;
 
 public class Apple extends AbstractFieldObject {
     private final int foodValue;

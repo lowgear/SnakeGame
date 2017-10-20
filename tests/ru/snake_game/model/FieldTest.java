@@ -1,13 +1,13 @@
-package ru.snake_game;
+package ru.snake_game.model;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import ru.snake_game.FieldObjects.SnakeHead;
-import ru.snake_game.FieldObjects.Wall;
-import ru.snake_game.Interfaces.IFieldObject;
-import ru.snake_game.util.Location;
-import ru.snake_game.util.Vector;
+import ru.snake_game.model.FieldObjects.SnakeHead;
+import ru.snake_game.model.FieldObjects.Wall;
+import ru.snake_game.model.Interfaces.IFieldObject;
+import ru.snake_game.model.util.Location;
+import ru.snake_game.model.util.Vector;
 
 import static org.junit.Assert.*;
 

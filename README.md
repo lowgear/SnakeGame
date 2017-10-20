@@ -1,2 +1,2 @@
 # SnakeGame
-ru.snake_game.Game for OOP.
+ru.snake_game.model.Game for OOP.

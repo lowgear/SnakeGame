@@ -1,9 +1,9 @@
-package ru.snake_game.FieldObjects;
+package ru.snake_game.model.FieldObjects;
 
 import com.sun.istack.internal.NotNull;
-import ru.snake_game.Interfaces.IField;
-import ru.snake_game.Interfaces.ISnakeHead;
-import ru.snake_game.util.Location;
+import ru.snake_game.model.Interfaces.IField;
+import ru.snake_game.model.Interfaces.ISnakeHead;
+import ru.snake_game.model.util.Location;
 
 public abstract class SnakePart extends AbstractSolidFieldObject {
     protected SnakeBody prev;

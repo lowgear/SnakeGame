@@ -1,4 +1,4 @@
-package ru.snake_game.util;
+package ru.snake_game.model.util;
 
 public class Location {
     private int x, y;

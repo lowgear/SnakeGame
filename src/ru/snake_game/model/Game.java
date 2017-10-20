@@ -1,8 +1,8 @@
-package ru.snake_game;
+package ru.snake_game.model;
 
-import ru.snake_game.Interfaces.IField;
-import ru.snake_game.Interfaces.IFieldObject;
-import ru.snake_game.Interfaces.IGame;
+import ru.snake_game.model.Interfaces.IField;
+import ru.snake_game.model.Interfaces.IFieldObject;
+import ru.snake_game.model.Interfaces.IGame;
 
 import java.util.HashSet;
 

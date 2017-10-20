@@ -1,10 +1,10 @@
-package ru.snake_game.FieldObjects;
+package ru.snake_game.model.FieldObjects;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import ru.snake_game.util.Location;
-import ru.snake_game.util.Vector;
+import ru.snake_game.model.util.Location;
+import ru.snake_game.model.util.Vector;
 
 import static org.junit.Assert.*;
 

@@ -1,11 +1,13 @@
-package ru.snake_game;
+package ru.snake_game.model;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import ru.snake_game.FieldObjects.*;
-import ru.snake_game.util.Location;
-import ru.snake_game.util.Vector;
+import ru.snake_game.model.FieldObjects.Apple;
+import ru.snake_game.model.FieldObjects.SnakeHead;
+import ru.snake_game.model.FieldObjects.Wall;
+import ru.snake_game.model.util.Location;
+import ru.snake_game.model.util.Vector;
 
 import java.util.ArrayList;
 
@@ -84,7 +86,7 @@ public class GameTest {
         vectors.add(new Vector(0,-1));
         vectors.add(new Vector(1,0));
 
-        for (int c = 0; c < 5; c++){
+        for (int j = 0; j < 5; j++) {
             for (Vector vector : vectors) {
                 for (int i = 0; i < 3; i++)
                     game.tick();

@@ -1,7 +1,7 @@
-package ru.snake_game.FieldObjects;
+package ru.snake_game.model.FieldObjects;
 
-import ru.snake_game.Interfaces.IFieldObject;
-import ru.snake_game.util.Location;
+import ru.snake_game.model.Interfaces.IFieldObject;
+import ru.snake_game.model.util.Location;
 
 abstract public class AbstractFieldObject implements IFieldObject {
     private Location location;

@@ -1,11 +1,11 @@
-package ru.snake_game;
+package ru.snake_game.model;
 
 import org.jetbrains.annotations.NotNull;
-import ru.snake_game.FieldObjects.SnakeHead;
-import ru.snake_game.Interfaces.IField;
-import ru.snake_game.Interfaces.IFieldObject;
-import ru.snake_game.Interfaces.ISnakeHead;
-import ru.snake_game.util.Location;
+import ru.snake_game.model.FieldObjects.SnakeHead;
+import ru.snake_game.model.Interfaces.IField;
+import ru.snake_game.model.Interfaces.IFieldObject;
+import ru.snake_game.model.Interfaces.ISnakeHead;
+import ru.snake_game.model.util.Location;
 
 import java.util.ArrayList;
 import java.util.Iterator;
