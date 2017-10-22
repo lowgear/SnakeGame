@@ -1,15 +1,16 @@
 package ru.snake_game.model;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ru.snake_game.model.FieldObjects.Apple;
+import ru.snake_game.model.FieldObjects.SnakeBody;
 import ru.snake_game.model.FieldObjects.SnakeHead;
 import ru.snake_game.model.FieldObjects.Wall;
 import ru.snake_game.model.util.Location;
 import ru.snake_game.model.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
@@ -38,40 +39,60 @@ public class GameTest {
         game = new Game(field);
     }
 
-    @After
-    public void tearDown() throws Exception {
-        field = null;
-        game = null;
-    }
-
     @Test
-    public void tick() throws Exception {
+    public void eatAndGo() throws Exception {
         Location location = new Location(1,1);
-        field.setObjectAt(location, new SnakeHead(location, null, new Vector(1,0), field));
-        location = new Location(3, 2);
+        SnakeHead snakeHead = new SnakeHead(location, null, new Vector(1,0), field);
+        field.setObjectAt(location, snakeHead);
+        location = new Location(2, 1);
         field.setObjectAt(location, new Apple(location, field, 2));
-        SnakeHead snakeHead = (SnakeHead) field.getSnakeHead();
 
-        game.tick();
-        game.tick();
-        snakeHead.setDirection(new Vector(0, 1));
-        game.tick();
-        game.tick();
-        game.tick();
-        snakeHead.setDirection(new Vector(-1,0));
         game.tick();
         game.tick();
         game.tick();
 
-        assertFalse(snakeHead.isAlive());
-        assertTrue(field.getObjectAt(new Location(0,4)) instanceof Wall);
-        assertNull(field.getObjectAt(new Location(3, 2)));
-        assertEquals(new Location(1,4), snakeHead.getLocation());
+        assertFalse(field.getObjectAt(new Location(2,1)) instanceof Apple);
         assertEquals(3, snakeHead.length());
     }
 
     @Test
-    public void cycleTick() throws Exception{
+    public void killSnake() throws  Exception{
+        Location location = new Location(1,1);
+        SnakeHead snakeHead = new SnakeHead(location, null, new Vector(1,0), field);
+        field.setObjectAt(location, snakeHead);
+
+        for (int i = 0; i < field.getWidth() - 2; i++)
+            game.tick();
+
+        assertFalse(snakeHead.isAlive());
+        assertTrue(field.getObjectAt(new Location(5,1)) instanceof Wall);
+        assertEquals(new Location(4, 1), snakeHead.getLocation());
+    }
+
+    @Test
+    public void snakeEatSelf() throws Exception{
+        Location location = new Location(2,2);
+
+        ArrayList<Location> bodyLocations = new ArrayList<>();
+        bodyLocations.add(new Location(3,2));
+        bodyLocations.add(new Location(3,1));
+        bodyLocations.add(new Location(2,1));
+        bodyLocations.add(new Location(1,1));
+
+        SnakeHead snakeHead = new SnakeHead(location, new Vector(0,-1), field, bodyLocations);
+        field.setObjectAt(location, snakeHead);
+
+        game.tick();
+
+        assertFalse(snakeHead.isAlive());
+        assertEquals(location, snakeHead.getLocation());
+        for (Location bodyLocation : bodyLocations){
+            assertTrue(field.getObjectAt(bodyLocation) instanceof SnakeBody);
+        }
+    }
+
+    @Test
+    public void snakeCycle() throws Exception{
         Location location = new Location(1,1);
         SnakeHead snakeHead = new SnakeHead(location, null, new Vector(1,0), field);
         field.setObjectAt(location, snakeHead);
@@ -84,7 +105,7 @@ public class GameTest {
         vectors.add(new Vector(0,-1));
         vectors.add(new Vector(1,0));
 
-        for (int j = 0; j < 5; j++) {
+        for (int c = 0; c < 5; c++){
             for (Vector vector : vectors) {
                 for (int i = 0; i < 3; i++)
                     game.tick();
