@@ -1,6 +1,6 @@
 package ru.snake_game.model;
 
-//import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NotNull;
 import ru.snake_game.model.FieldObjects.SnakeHead;
 import ru.snake_game.model.Interfaces.IField;
 import ru.snake_game.model.Interfaces.IFieldObject;
@@ -15,9 +15,7 @@ public class Field implements IField, Iterable<IFieldObject> {
     private int height;
     private int width;
 
-    public Field(int height, int width) throws Exception {
-        if (height < 1 || width < 1)
-            throw new Exception("Field can`t to be built, incorrect parameters");
+    public Field(int height, int width) {
         this.height = height;
         this.width = width;
         int n = width * height;
@@ -70,7 +68,7 @@ public class Field implements IField, Iterable<IFieldObject> {
         return y * width + x;
     }
 
-    //@NotNull
+    @NotNull
     @Override
     public Iterator<IFieldObject> iterator() {
         return field.iterator();
