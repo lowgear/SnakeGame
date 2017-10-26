@@ -17,8 +17,8 @@ public class FieldTest {
     @Before
     public void setUp() throws Exception {
         field = new Field(4,4);
-        field.setObjectAt(0,0, new Wall(new Location(0,0), field));
-        field.setObjectAt(1,1, new Wall(new Location(1,1), field));
+        field.addObject(new Wall(new Location(0, 0)));
+        field.addObject(new Wall(new Location(1, 1)));
     }
 
     @After
@@ -41,14 +41,14 @@ public class FieldTest {
     @Test
     public void setObjectAt() throws Exception {
         Location location = new Location(2,2);
-        field.setObjectAt(location, new Wall(location, field));
+        field.addObject(new Wall(location));
         assertTrue(field.getObjectAt(2,2) instanceof  Wall);
     }
 
     @Test
     public void setObjectAt1() throws Exception {
         Location location = new Location(3,3);
-        field.setObjectAt(location, new Wall(location, field));
+        field.addObject(new Wall(location));
         assertTrue(field.getObjectAt(location) instanceof Wall);
     }
 
@@ -65,7 +65,7 @@ public class FieldTest {
     @Test
     public void getSnakeHead() throws Exception {
         Location location = new Location(0,1);
-        field.setObjectAt(location, new SnakeHead(location, null, new Vector(0,1), field));
+        field.addObject(new SnakeHead(location, null, new Vector(0, 1), field));
         assertEquals(location, field.getSnakeHead().getLocation());
     }
 

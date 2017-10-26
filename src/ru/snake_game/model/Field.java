@@ -9,15 +9,16 @@ import ru.snake_game.model.util.Location;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class Field implements IField, Iterable<IFieldObject> {
     private ArrayList<IFieldObject> field;
     private int height;
     private int width;
 
-    public Field(int height, int width) throws Exception {
+    public Field(int height, int width) {
         if (height < 1 || width < 1)
-            throw new Exception("Field can`t to be built, incorrect parameters");
+            throw new IllegalArgumentException("Field can`t to be built, incorrect parameters");
         this.height = height;
         this.width = width;
         int n = width * height;
@@ -38,13 +39,9 @@ public class Field implements IField, Iterable<IFieldObject> {
     }
 
     @Override
-    public void setObjectAt(int x, int y, IFieldObject object) {
-        field.set(getIndexInField(x, y), object);
-    }
-
-    @Override
-    public void setObjectAt(Location location, IFieldObject object) {
-        setObjectAt(location.getX(), location.getY(), object);
+    public void addObject(IFieldObject object) {
+        Location loc = object.getLocation();
+        field.set(getIndexInField(loc.getX(), loc.getY()), object);
     }
 
     @Override
@@ -66,6 +63,11 @@ public class Field implements IField, Iterable<IFieldObject> {
         return snakeHead;
     }
 
+    @Override
+    public void eraseAt(Location location) {
+        field.set(getIndexInField(location.getX(), location.getY()), null);
+    }
+
     private int getIndexInField(int x, int y) {
         return y * width + x;
     }
@@ -73,6 +75,6 @@ public class Field implements IField, Iterable<IFieldObject> {
     @NotNull
     @Override
     public Iterator<IFieldObject> iterator() {
-        return field.iterator();
+        return field.stream().filter(Objects::nonNull).iterator();
     }
 }

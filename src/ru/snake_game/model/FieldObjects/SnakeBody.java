@@ -18,7 +18,7 @@ public class SnakeBody extends SnakePart {
     protected void move() {
         moveChild();
         setLocation(next.getLocation());
-        field.setObjectAt(getLocation(), this);
+        field.addObject(this);
     }
 
     @Override

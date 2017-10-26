@@ -24,15 +24,15 @@ public class GameTest {
         int height = field.getHeight();
         for (int y = 0; y < height; y += 1) {
             Location location = new Location(0, y);
-            field.setObjectAt(location, new Wall(location, field));
+            field.addObject(new Wall(location));
             location = new Location(width - 1, y);
-            field.setObjectAt(location, new Wall(location, field));
+            field.addObject(new Wall(location));
         }
         for (int x = 1; x < width - 1; x++) {
             Location location = new Location(x, 0);
-            field.setObjectAt(location, new Wall(location, field));
+            field.addObject(new Wall(location));
             location = new Location(x, height - 1);
-            field.setObjectAt(location, new Wall(location, field));
+            field.addObject(new Wall(location));
         }
 
         game = new Game(field);
@@ -47,9 +47,9 @@ public class GameTest {
     @Test
     public void tick() throws Exception {
         Location location = new Location(1,1);
-        field.setObjectAt(location, new SnakeHead(location, null, new Vector(1,0), field));
+        field.addObject(new SnakeHead(location, null, new Vector(1, 0), field));
         location = new Location(3, 2);
-        field.setObjectAt(location, new Apple(location, field, 2));
+        field.addObject(new Apple(location, field, 2));
         SnakeHead snakeHead = (SnakeHead) field.getSnakeHead();
 
         game.tick();
@@ -74,9 +74,9 @@ public class GameTest {
     public void cycleTick() throws Exception{
         Location location = new Location(1,1);
         SnakeHead snakeHead = new SnakeHead(location, null, new Vector(1,0), field);
-        field.setObjectAt(location, snakeHead);
+        field.addObject(snakeHead);
         location  = new Location(2,1);
-        field.setObjectAt(location, new Apple(location, field, 11));
+        field.addObject(new Apple(location, field, 11));
 
         ArrayList<Vector> vectors = new ArrayList<>();
         vectors.add(new Vector(0,1));

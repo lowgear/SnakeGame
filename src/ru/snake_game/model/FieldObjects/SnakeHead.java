@@ -13,6 +13,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
     private boolean alive = true;
     private boolean justAte;
+    private int cnt = 0;
 
     public SnakeHead(Location location, SnakeBody prev, Vector direction, IField field) {
         super(location, prev, field);
@@ -27,7 +28,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         SnakePart tail = this;
         for (Location partLocation : bodyLocation) {
             tail.prev = new SnakeBody(partLocation, this, null, tail);
-            field.setObjectAt(partLocation, tail.prev);
+            field.addObject(tail.prev);
             tail = tail.prev;
         }
     }
@@ -71,12 +72,12 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
             tail.prev = new SnakeBody(t, this, null, tail);
             lengthToGrow--;
 
-            field.setObjectAt(t, tail.prev);
+            field.addObject(tail.prev);
         } else
             moveChild();
 
         setLocation(getLocation().moved(direction));
-        field.setObjectAt(getLocation(), this);
+        field.addObject(this);
         justAte = false;
     }
 
@@ -97,8 +98,9 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
         if (direction.getY() * direction.getX() != 0 || Math.abs(direction.getY() + direction.getX()) != 1)
             throw new IllegalArgumentException("Direction module is not 1.");
 
-        if (prev == null || prev.getLocation() != getLocation().moved(direction))
+        if (prev == null || !prev.getLocation().equals(getLocation().moved(direction)))
             this.direction = direction;
+        cnt++;
     }
 
     @Override
