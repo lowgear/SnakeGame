@@ -1,5 +1,6 @@
 package ru.snake_game.model;
 
+import org.jetbrains.annotations.NotNull;
 import ru.snake_game.model.FieldObjects.SnakeHead;
 import ru.snake_game.model.Interfaces.IField;
 import ru.snake_game.model.Interfaces.IFieldObject;
@@ -8,6 +9,7 @@ import ru.snake_game.model.util.Location;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class Field implements IField, Iterable<IFieldObject> {
     private ArrayList<IFieldObject> field;
@@ -15,6 +17,8 @@ public class Field implements IField, Iterable<IFieldObject> {
     private int width;
 
     public Field(int height, int width) {
+        if (height < 1 || width < 1)
+            throw new IllegalArgumentException("Field can`t to be built, incorrect parameters");
         this.height = height;
         this.width = width;
         int n = width * height;
@@ -35,13 +39,9 @@ public class Field implements IField, Iterable<IFieldObject> {
     }
 
     @Override
-    public void setObjectAt(int x, int y, IFieldObject object) {
-        field.set(getIndexInField(x, y), object);
-    }
-
-    @Override
-    public void setObjectAt(Location location, IFieldObject object) {
-        setObjectAt(location.getX(), location.getY(), object);
+    public void addObject(IFieldObject object) {
+        Location loc = object.getLocation();
+        field.set(getIndexInField(loc.getX(), loc.getY()), object);
     }
 
     @Override
@@ -63,12 +63,18 @@ public class Field implements IField, Iterable<IFieldObject> {
         return snakeHead;
     }
 
+    @Override
+    public void eraseAt(Location location) {
+        field.set(getIndexInField(location.getX(), location.getY()), null);
+    }
+
     private int getIndexInField(int x, int y) {
         return y * width + x;
     }
 
+    @NotNull
     @Override
     public Iterator<IFieldObject> iterator() {
-        return field.iterator();
+        return field.stream().filter(Objects::nonNull).iterator();
     }
 }

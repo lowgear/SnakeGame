@@ -26,7 +26,7 @@ public abstract class SnakePart extends AbstractSolidFieldObject {
         if (prev != null)
             prev.move();
         else
-            field.setObjectAt(this.getLocation(), null);
+            field.eraseAt(getLocation());
     }
 
     @Override

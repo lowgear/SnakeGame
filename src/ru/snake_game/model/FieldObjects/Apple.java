@@ -21,6 +21,6 @@ public class Apple extends AbstractFieldObject {
     @Override
     public void snakeInteract(ISnakeHead snake) {
         snake.eat(foodValue);
-        field.setObjectAt(getLocation(), null);
+        field.eraseAt(getLocation());
     }
 }

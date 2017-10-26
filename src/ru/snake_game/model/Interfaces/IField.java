@@ -11,9 +11,9 @@ public interface IField extends Iterable<IFieldObject> {
 
     IFieldObject getObjectAt(int x, int y);
 
-    void setObjectAt(Location location, IFieldObject object);
-
-    void setObjectAt(int x, int y, IFieldObject object);
+    void addObject(IFieldObject object);
 
     ISnakeHead getSnakeHead();
+
+    void eraseAt(Location location);
 }
