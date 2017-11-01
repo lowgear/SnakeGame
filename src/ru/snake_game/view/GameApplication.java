@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -12,6 +13,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -35,6 +37,11 @@ import ru.snake_game.model.util.Location;
 import ru.snake_game.model.util.Vector;
 import ru.snake_game.view.util.INoArgFunction;
 
+import javax.swing.text.html.ImageView;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -110,27 +117,9 @@ public class GameApplication extends Application {
                 new Button("Quit to Main Menu")
         };
 
-        buttons[0].setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                primaryStage.setScene(gameScene);
-            }
-        });
-
-        buttons[1].setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                initGameScene();
-                primaryStage.setScene(gameScene);
-            }
-        });
-
-        buttons[2].setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                primaryStage.setScene(mainMenuScene);
-            }
-        });
+        buttons[0].setOnAction(event -> primaryStage.setScene(gameScene));
+        buttons[1].setOnAction(event -> startGame());
+        buttons[2].setOnAction(event -> primaryStage.setScene(mainMenuScene));
 
         GridPane root = new GridPane();
         root.setAlignment(Pos.CENTER);
@@ -147,7 +136,7 @@ public class GameApplication extends Application {
         }
         root.getChildren().addAll(buttons);
 
-        pauseMenuScene = new Scene(root, desiredWidth(), desiredHeight());
+        pauseMenuScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
     private void arrangeTickLineAndDrawnObjects() {
@@ -233,7 +222,7 @@ public class GameApplication extends Application {
         root.getChildren().add(gameArea);
 
         HashMap<KeyCode, Runnable> keyPressActions = new HashMap<>();
-        keyPressActions.put(KeyCode.ESCAPE, this::startGame);
+        keyPressActions.put(KeyCode.ESCAPE, () -> primaryStage.setScene(pauseMenuScene));
         keyPressActions.put(KeyCode.UP, () -> snake.setDirection(Vector.UP));
         keyPressActions.put(KeyCode.DOWN, () -> snake.setDirection(Vector.DOWN));
         keyPressActions.put(KeyCode.LEFT, () -> snake.setDirection(Vector.LEFT));
