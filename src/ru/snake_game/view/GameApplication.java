@@ -4,16 +4,12 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.embed.swing.SwingFXUtils;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -37,11 +33,6 @@ import ru.snake_game.model.util.Location;
 import ru.snake_game.model.util.Vector;
 import ru.snake_game.view.util.INoArgFunction;
 
-import javax.swing.text.html.ImageView;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -50,15 +41,18 @@ public class GameApplication extends Application {
 
     public static final int WINDOW_WIDTH = 800;
     public static final int WINDOW_HEIGHT = 600;
-    private static final Duration TICK_DURATION = new Duration(200);
 
     private Scene mainMenuScene;
     private Scene gameScene;
     private Scene pauseMenuScene;
 
-    private Game game;
-    private SnakeHead snake;
+    SubScene gameArea;
 
+    private Duration tickDuration = new Duration(200);
+    private double cellSize;
+    private double strokeWidth;
+    private SnakeHead snake;
+    private Game game;
     private Timeline tickLine;
     private Group gameObjectsToDraw;
     private HashMap<IFieldObject, Node> drawnObjects;
@@ -73,110 +67,119 @@ public class GameApplication extends Application {
         howToPaint = new HashMap<>();
         howToPaint.put(Wall.class, () -> {
             Rectangle res = new Rectangle(
-                    ((double) WINDOW_HEIGHT) / game.getField().getWidth(),
-                    ((double) WINDOW_HEIGHT) / game.getField().getHeight());
+                    cellSize,
+                    cellSize);
             res.setFill(Color.GRAY);
             res.setStrokeType(StrokeType.INSIDE);
             res.setStroke(Color.BLACK);
-            res.setStrokeWidth(10);
+            res.setStrokeWidth(strokeWidth);
             return res;
         });
         howToPaint.put(SnakeHead.class, () -> {
-            double r = ((double) WINDOW_HEIGHT) / game.getField().getWidth() / 2;
+            double r = cellSize / 2;
             Circle res = new Circle(r, r, r);
             res.setStrokeType(StrokeType.INSIDE);
             res.setStroke(Color.BLACK);
-            res.setStrokeWidth(10);
+            res.setStrokeWidth(strokeWidth);
             res.setFill(Color.LIGHTGREEN);
             return res;
         });
         howToPaint.put(SnakeBody.class, () -> {
-            double r = ((double) WINDOW_HEIGHT) / game.getField().getWidth() / 2;
+            double r = cellSize / 2;
             Circle res = new Circle(r, r, r);
             res.setStrokeType(StrokeType.INSIDE);
             res.setStroke(Color.BLACK);
-            res.setStrokeWidth(10);
+            res.setStrokeWidth(strokeWidth);
             res.setFill(Color.GREEN);
             return res;
         });
         howToPaint.put(Apple.class, () -> {
-            double r = ((double) WINDOW_HEIGHT) / game.getField().getWidth() / 2;
+            double r = cellSize / 2;
             Circle res = new Circle(r, r, r);
             res.setStrokeType(StrokeType.INSIDE);
             res.setStroke(Color.BLACK);
-            res.setStrokeWidth(10);
+            res.setStrokeWidth(strokeWidth);
             res.setFill(Color.RED);
             return res;
         });
     }
 
-    private void initPauseMenuScene() {
-        Button[] buttons = new Button[]{
-                new Button("Resume"),
-                new Button("Restart"),
-                new Button("Quit to Main Menu")
-        };
+    private void initGameScene() {
+        tickLine = new Timeline();
+        tickLine.setOnFinished(event -> {
+            game.tick();
+            handle(game.getField());
+            arrangeTickLineAndDrawnObjects();
+            tickLine.play();
+        });
 
-        buttons[0].setOnAction(event -> primaryStage.setScene(gameScene));
-        buttons[1].setOnAction(event -> startGame());
-        buttons[2].setOnAction(event -> primaryStage.setScene(mainMenuScene));
+        Group root = new Group();
+        gameScene = new Scene(root);
 
-        GridPane root = new GridPane();
-        root.setAlignment(Pos.CENTER);
-        root.setVgap(20);
+        gameObjectsToDraw = new Group();
+        //noinspection SuspiciousNameCombination
+        gameArea = new SubScene(gameObjectsToDraw, WINDOW_HEIGHT, WINDOW_HEIGHT);
+        gameArea.setFill(Color.LIGHTGRAY);
+        root.getChildren().add(gameArea);
 
-        Text scenetitle = new Text();
-        scenetitle.setText("PAUSE");
-        scenetitle.setFont(Font.font("verdana", FontWeight.BOLD, 50));
-        root.add(scenetitle, 0, 0);
+        HashMap<KeyCode, Runnable> keyPressActions = new HashMap<>();
+        keyPressActions.put(KeyCode.ESCAPE, this::pauseGame);
+        keyPressActions.put(KeyCode.UP, () -> snake.setDirection(Vector.UP));
+        keyPressActions.put(KeyCode.DOWN, () -> snake.setDirection(Vector.DOWN));
+        keyPressActions.put(KeyCode.LEFT, () -> snake.setDirection(Vector.LEFT));
+        keyPressActions.put(KeyCode.RIGHT, () -> snake.setDirection(Vector.RIGHT));
 
-        for (int i = 0; i < buttons.length; i++) {
-            buttons[i].setMinSize(180, 40);
-            GridPane.setConstraints(buttons[i], 0, i + 1);
-        }
-        root.getChildren().addAll(buttons);
+        gameScene.setOnKeyPressed(event -> {
+            Runnable toDo = keyPressActions.get(event.getCode());
+            if (toDo != null)
+                toDo.run();
+        });
+    }
 
-        pauseMenuScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+    private void startGame() {
+        @SuppressWarnings("MagicNumber") IField field = FieldGenerators.genBoardedField(15, 15);
+        snake = new SnakeHead(new Location(4, 4), null, Vector.RIGHT, field);
+        field.addObject(snake);
+        game = new Game(field);
+        drawnObjects = new HashMap<>();
+        cellSize = ((double) Integer.min(WINDOW_HEIGHT, WINDOW_WIDTH)) / game.getField().getWidth();
+        strokeWidth = cellSize / 20;
+        arrangeTickLineAndDrawnObjects();
+        tickLine.play();
+        primaryStage.setScene(gameScene);
+    }
+
+    private void pauseGame() {
+        primaryStage.setScene(pauseMenuScene);
+        tickLine.pause();
     }
 
     private void arrangeTickLineAndDrawnObjects() {
         tickLine.getKeyFrames().clear();
         gameObjectsToDraw.getChildren().clear();
 
-        for (IFieldObject object : game.getField()) {
+        IField field = game.getField();
+        for (IFieldObject object : field) {
             Node node;
+            Location loc = object.getLocation();
             if (drawnObjects.containsKey(object)) {
                 node = drawnObjects.get(object);
-                Location loc = object.getLocation();
-                tickLine.getKeyFrames().add(new KeyFrame(TICK_DURATION,
+                tickLine.getKeyFrames().add(new KeyFrame(tickDuration,
                         new KeyValue(node.translateXProperty(),
-                                ((double) loc.getX()) / game.getField().getWidth() * WINDOW_HEIGHT),
+                                ((double) loc.getX()) / field.getWidth() * WINDOW_HEIGHT),
                         new KeyValue(node.translateYProperty(),
-                                ((double) loc.getY()) / game.getField().getHeight() * WINDOW_HEIGHT)));
+                                ((double) loc.getY()) / field.getHeight() * WINDOW_HEIGHT)));
             } else {
                 node = howToPaint.get(object.getClass()).run();
                 drawnObjects.put(object, node);
-                Location loc = object.getLocation();
-                node.translateXProperty().setValue(((double) loc.getX()) / game.getField().getWidth() * WINDOW_HEIGHT);
-                node.translateYProperty().setValue(((double) loc.getY()) / game.getField().getHeight() * WINDOW_HEIGHT);
+                node.translateXProperty().setValue(((double) loc.getX()) / field.getWidth() * WINDOW_HEIGHT);
+                node.translateYProperty().setValue(((double) loc.getY()) / field.getHeight() * WINDOW_HEIGHT);
             }
             gameObjectsToDraw.getChildren().add(node);
         }
     }
 
-    private void startGame() {
-        @SuppressWarnings("MagicNumber") IField field = FieldGenerators.genBoardedField(10, 20);
-        snake = new SnakeHead(new Location(4, 4), null, Vector.RIGHT, field);
-        field.addObject(snake);
-        game = new Game(field);
-        drawnObjects = new HashMap<>();
-
-        arrangeTickLineAndDrawnObjects();
-        tickLine.play();
-        primaryStage.setScene(gameScene);
-    }
-
-    private void hanle(IField field) {
+    private void handle(IField field) {
         boolean hasApple = false;
         for (IFieldObject object :
                 field) {
@@ -203,36 +206,40 @@ public class GameApplication extends Application {
         }
     }
 
-    private void initGameScene() {
-        tickLine = new Timeline();
-        tickLine.setOnFinished(event -> {
-            game.tick();
-            hanle(game.getField());
-            arrangeTickLineAndDrawnObjects();
+    private void initPauseMenuScene() {
+        Button[] buttons = new Button[]{
+                new Button("Resume"),
+                new Button("Restart"),
+                new Button("Quit to Main Menu")
+        };
+
+        buttons[0].setOnAction(event -> {
+            primaryStage.setScene(gameScene);
             tickLine.play();
         });
 
-        Group root = new Group();
-        gameScene = new Scene(root);
+        buttons[1].setOnAction(event -> startGame());
 
-        gameObjectsToDraw = new Group();
-        //noinspection SuspiciousNameCombination
-        SubScene gameArea = new SubScene(gameObjectsToDraw, WINDOW_HEIGHT, WINDOW_HEIGHT);
-        gameArea.setFill(Color.LIGHTGRAY);
-        root.getChildren().add(gameArea);
-
-        HashMap<KeyCode, Runnable> keyPressActions = new HashMap<>();
-        keyPressActions.put(KeyCode.ESCAPE, () -> primaryStage.setScene(pauseMenuScene));
-        keyPressActions.put(KeyCode.UP, () -> snake.setDirection(Vector.UP));
-        keyPressActions.put(KeyCode.DOWN, () -> snake.setDirection(Vector.DOWN));
-        keyPressActions.put(KeyCode.LEFT, () -> snake.setDirection(Vector.LEFT));
-        keyPressActions.put(KeyCode.RIGHT, () -> snake.setDirection(Vector.RIGHT));
-
-        gameScene.setOnKeyPressed(event -> {
-            Runnable toDo = keyPressActions.get(event.getCode());
-            if (toDo != null)
-                toDo.run();
+        buttons[2].setOnAction(event -> {
+            tickLine.stop();
+            primaryStage.setScene(mainMenuScene);
         });
+
+        GridPane root = new GridPane();
+        root.setAlignment(Pos.CENTER);
+        root.setVgap(20);
+
+        Text sceneTitle = new Text();
+        sceneTitle.setText("PAUSE");
+        sceneTitle.setFont(Font.font("verdana", FontWeight.BOLD, 50));
+        root.add(sceneTitle, 0, 0);
+
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].setMinSize(180, 40);
+            GridPane.setConstraints(buttons[i], 0, i + 1);
+        }
+        root.getChildren().addAll(buttons);
+        pauseMenuScene = new Scene(root);
     }
 
     private void initMainMenuScene() {
@@ -274,10 +281,15 @@ public class GameApplication extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
         primaryStage.resizableProperty().setValue(false);
-        primaryStage.setMinWidth(WINDOW_WIDTH);
-        primaryStage.setMinHeight(WINDOW_HEIGHT);
 
         primaryStage.setScene(mainMenuScene);
         primaryStage.show();
+
+        primaryStage.setWidth(WINDOW_WIDTH
+                + mainMenuScene.getWindow().getWidth()
+                - mainMenuScene.getWidth());
+        primaryStage.setHeight(WINDOW_HEIGHT
+                + mainMenuScene.getWindow().getHeight()
+                - mainMenuScene.getHeight());
     }
 }
