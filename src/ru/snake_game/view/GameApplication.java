@@ -10,8 +10,9 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -48,7 +49,7 @@ public class GameApplication extends Application {
 
     SubScene gameArea;
 
-    private Duration tickDuration = new Duration(200);
+    private Duration tickDuration = new Duration(100);
     private double cellSize;
     private double strokeWidth;
     private SnakeHead snake;
@@ -110,7 +111,12 @@ public class GameApplication extends Application {
             game.tick();
             handle(game.getField());
             arrangeTickLineAndDrawnObjects();
-            tickLine.play();
+            if (snake.isAlive())
+                tickLine.play();
+//            else {
+//                Text text = new Text("YOU DIED");
+//                ((Group)gameScene.getRoot()).getChildren().add(text);
+//            }
         });
 
         Group root = new Group();
@@ -119,6 +125,8 @@ public class GameApplication extends Application {
         gameObjectsToDraw = new Group();
         //noinspection SuspiciousNameCombination
         gameArea = new SubScene(gameObjectsToDraw, WINDOW_HEIGHT, WINDOW_HEIGHT);
+        gameArea.layoutXProperty().bind(gameArea.widthProperty().divide(2).subtract(WINDOW_WIDTH / 2).multiply(-1));
+        gameArea.layoutYProperty().bind(gameArea.heightProperty().divide(2).subtract(WINDOW_HEIGHT / 2).multiply(-1));
         gameArea.setFill(Color.LIGHTGRAY);
         root.getChildren().add(gameArea);
 
@@ -151,6 +159,17 @@ public class GameApplication extends Application {
 
     private void pauseGame() {
         primaryStage.setScene(pauseMenuScene);
+        WritableImage image = new WritableImage(WINDOW_WIDTH, WINDOW_HEIGHT);
+        gameScene.snapshot(image);
+        ((GridPane) (pauseMenuScene.getRoot()))
+                .setBackground(
+                        new Background(
+                                new BackgroundImage(
+                                        image,
+                                        BackgroundRepeat.NO_REPEAT,
+                                        BackgroundRepeat.NO_REPEAT,
+                                        BackgroundPosition.CENTER,
+                                        BackgroundSize.DEFAULT)));
         tickLine.pause();
     }
 
