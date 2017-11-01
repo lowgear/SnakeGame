@@ -1,5 +1,6 @@
 package ru.snake_game.model;
 
+import org.jetbrains.annotations.NotNull;
 import ru.snake_game.model.FieldObjects.SnakeHead;
 import ru.snake_game.model.Interfaces.IField;
 import ru.snake_game.model.Interfaces.IFieldObject;
@@ -71,6 +72,7 @@ public class Field implements IField, Iterable<IFieldObject> {
         return y * width + x;
     }
 
+    @NotNull
     @Override
     public Iterator<IFieldObject> iterator() {
         return field.stream().filter(Objects::nonNull).iterator();
