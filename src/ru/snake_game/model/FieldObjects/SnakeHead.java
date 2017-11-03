@@ -123,6 +123,8 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
     @Override
     public void act() {
+        if (!isAlive())
+            return;
         IFieldObject directionObject = field.getObjectAt(getLocation().moved(direction));
         if (directionObject != null)
             directionObject.snakeInteract(this);
