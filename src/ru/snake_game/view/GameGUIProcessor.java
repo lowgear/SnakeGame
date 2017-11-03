@@ -2,78 +2,159 @@ package ru.snake_game.view;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.event.EventHandler;
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.SubScene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.util.Duration;
-import ru.snake_game.model.FieldGenerators;
-import ru.snake_game.model.FieldObjects.Apple;
-import ru.snake_game.model.FieldObjects.SnakeHead;
 import ru.snake_game.model.Game;
 import ru.snake_game.model.Interfaces.IField;
 import ru.snake_game.model.Interfaces.IFieldObject;
-import ru.snake_game.model.util.Location;
+import ru.snake_game.model.Interfaces.ISnakeHead;
 import ru.snake_game.model.util.Vector;
+import ru.snake_game.view.util.IFieldObjectPainter;
 import ru.snake_game.view.util.NodeAndAnimation;
 
 import java.util.HashMap;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.HashSet;
 import java.util.function.Function;
 
-public class GameGUIProcessor {
-    private static final double cellSize = 10;
-    SubScene gameArea;
-    private Duration tickDuration = new Duration(100);
-    private SnakeHead snake;
-    private Game game;
-    private Timeline tickLine;
-    private Group gameObjectsToDraw;
-    private HashMap<IFieldObject, Node> drawnObjects;
-    private Function<IFieldObject, NodeAndAnimation> objectPainter;
+import static ru.snake_game.view.util.NodeAndAnimation.CELL_SIZE;
 
+public class GameGUIProcessor implements IGameGUIProcessor {
+    private static final Function<IField, Object> NO_LOGIC = (field) -> null;
+    private final SubScene gameArea;
+    private final ISnakeHead snake;
+    private final Game game;
+    private final Group objectsGroup = new Group();
+    private final HashMap<IFieldObject, NodeAndAnimation> drawings = new HashMap<>();
+    private final Timeline tickScheduler = new Timeline();
+    private final IFieldObjectPainter objectPainter;
+    private final boolean inited;
+    private Duration tickDuration = Duration.seconds(1);
+    private Runnable onPauseAction;
+    private Function<IField, Object> gameLogic = NO_LOGIC;
 
-    private void initGameScene() {
-        tickLine = new Timeline();
-        tickLine.setOnFinished(event -> {
-            game.tick();
-            handle(game.getField());
-            arrangeTickLineAndDrawnObjects();
-            tickLine.play();
-        });
+    public GameGUIProcessor(IField field, IFieldObjectPainter objectPainter) {
+        gameArea = new SubScene(
+                objectsGroup,
+                CELL_SIZE * field.getWidth(),
+                CELL_SIZE * field.getHeight());
 
+        snake = findSnake(field);
+        game = new Game(field);
 
-        gameObjectsToDraw = new Group();
-        gameArea = new SubScene(gameObjectsToDraw, , );
+        this.objectPainter = objectPainter;
+
+        setUpTickScheduler();
+        setUpControls();
+        setUpGraphics();
+
+        inited = true;
+    }
+
+    private static ISnakeHead findSnake(IField field) {
+        ISnakeHead res = null;
+        for (IFieldObject object : field)
+            if (object instanceof ISnakeHead) {
+                if (res == null)
+                    res = (ISnakeHead) object;
+                else
+                    throw new IllegalStateException();
+            }
+        if (res != null)
+            return res;
+        throw new IllegalStateException();
+    }
+
+    private void setUpControls() {
+        if (inited)
+            throw new IllegalStateException();
 
         HashMap<KeyCode, Runnable> keyPressActions = new HashMap<>();
-        keyPressActions.put(KeyCode.ESCAPE, this::pauseGame);
+        keyPressActions.put(KeyCode.ESCAPE, this::pause);
         keyPressActions.put(KeyCode.UP, () -> snake.setDirection(Vector.UP));
         keyPressActions.put(KeyCode.DOWN, () -> snake.setDirection(Vector.DOWN));
         keyPressActions.put(KeyCode.LEFT, () -> snake.setDirection(Vector.LEFT));
         keyPressActions.put(KeyCode.RIGHT, () -> snake.setDirection(Vector.RIGHT));
 
-        gameScene.setOnKeyPressed(event -> {
+        gameArea.setOnKeyPressed(event -> {
             Runnable toDo = keyPressActions.get(event.getCode());
             if (toDo != null)
                 toDo.run();
         });
     }
 
-    private void arrangeTickLineAndDrawnObjects() {
+    private void setUpTickScheduler() {
+        if (inited)
+            throw new IllegalStateException();
+
+        tickScheduler.setOnFinished((event) -> {
+            game.tick();
+            gameLogic.apply(game.getField());
+            setUpGraphics();
+            tickScheduler.play();
+        });
+        tickScheduler.getKeyFrames().add(new KeyFrame(tickDuration));
+    }
+
+    private void setUpGraphics() {
+        if (inited)
+            throw new IllegalStateException();
+
+        removeNotPresentObjects();
+        addNewObjects();
+    }
+
+    private void addNewObjects() {
+        for (IFieldObject object : game.getField())
+            if (!drawings.containsKey(object)) {
+                NodeAndAnimation nodeAndAnimation = objectPainter.paint(object);
+                normalizeAnimationToTick(nodeAndAnimation.tickAnimation);
+                objectsGroup.getChildren().add(nodeAndAnimation.node);
+                drawings.put(object, nodeAndAnimation);
+            }
+    }
+
+    private void removeNotPresentObjects() {
+        HashSet<IFieldObject> presentObjects = new HashSet<>();
+        game.getField().forEach((presentObjects::add));
+        for (IFieldObject object : drawings.keySet())
+            if (!presentObjects.contains(object))
+                drawings.remove(object);
+    }
+
+    private void normalizeAnimationToTick(Animation animation) {
+        double rate = animation.getCycleDuration().toMillis() / tickDuration.toMillis();
+        animation.setRate(rate);
+    }
+
+
+    /*private void initGameScene() {
+        tickLine = new Timeline();
+        tickLine.setOnFinished(event -> {
+            game.tick();
+            emit(game.getField());
+            arrangeTickLineAndDrawnObjects();
+            tickLine.play();
+        });
+
+
+        objectsGroup = new Group();
+        gameArea = new SubScene(objectsGroup, , );
+    }*/
+
+    /*private void arrangeTickLineAndDrawnObjects() {
         tickLine.getKeyFrames().clear();
-        gameObjectsToDraw.getChildren().clear();
+        objectsGroup.getChildren().clear();
 
         IField field = game.getField();
         for (IFieldObject object : field) {
             Node node;
             Location loc = object.getLocation();
-            if (drawnObjects.containsKey(object)) {
-                node = drawnObjects.get(object);
+            if (drawings.containsKey(object)) {
+                node = drawings.get(object);
                 tickLine.getKeyFrames().add(new KeyFrame(tickDuration,
                         new KeyValue(node.translateXProperty(),
                                 ((double) loc.getX()) / field.getWidth() * gameArea.getWidth()),
@@ -81,15 +162,15 @@ public class GameGUIProcessor {
                                 ((double) loc.getY()) / field.getHeight() * gameArea.getHeight())));
             } else {
                 node = howToPaint.get(object.getClass()).run();
-                drawnObjects.put(object, node);
+                drawings.put(object, node);
                 node.translateXProperty().setValue(((double) loc.getX()) / field.getWidth() * gameArea.getWidth());
                 node.translateYProperty().setValue(((double) loc.getY()) / field.getHeight() * gameArea.getHeight());
             }
-            gameObjectsToDraw.getChildren().add(node);
+            objectsGroup.getChildren().add(node);
         }
-    }
+    }*/
 
-    private void handle(IField field) {
+    /*private void emit(IField field) {
         boolean hasApple = false;
         for (IFieldObject object :
                 field) {
@@ -114,52 +195,51 @@ public class GameGUIProcessor {
                     )
             );
         }
-    }
+    }*/
 
-    private void startGame() {
-        @SuppressWarnings("MagicNumber") IField field = FieldGenerators.genBoardedField(20, 15);
-        if (field.getWidth() / field.getHeight() > WINDOW_WIDTH / WINDOW_HEIGHT) {
-            gameArea.setWidth(WINDOW_WIDTH);
-            gameArea.setHeight(WINDOW_WIDTH / field.getWidth() * field.getHeight());
-        } else {
-            gameArea.setWidth(WINDOW_HEIGHT / field.getHeight() * field.getWidth());
-            gameArea.setHeight(WINDOW_HEIGHT);
-        }
-        cellSize = gameArea.getHeight() / field.getHeight();
-
-        snake = new SnakeHead(new Location(4, 4), null, Vector.RIGHT, field);
-        field.addObject(snake);
-        game = new Game(field);
-        drawnObjects = new HashMap<>();
-        cellSize = Double.min(WINDOW_HEIGHT, WINDOW_WIDTH) / game.getField().getWidth();
-        strokeWidth = cellSize / 10;
-        arrangeTickLineAndDrawnObjects();
-        tickLine.play();
-        primaryStage.setScene(gameScene);
-    }
-
+    @Override
     public SubScene getScene() {
-        //todo
+        return gameArea;
     }
 
-    public void addObject(IFieldObject object, Node node, Animation animation) {
-        //todo
+    @Override
+    public void setOnPause(Runnable action) {
+        onPauseAction = action;
     }
 
-    public void setOnPause(Runnable handler) {
-        //todo
-    }
-
+    @Override
     public void play() {
-        //todo
+        for (NodeAndAnimation nodeAndAnimation : drawings.values()) {
+            if (nodeAndAnimation.animation != null)
+                nodeAndAnimation.animation.play();
+            if (nodeAndAnimation.tickAnimation != null)
+                nodeAndAnimation.tickAnimation.play();
+        }
+        tickScheduler.play();
     }
 
-    public EventHandler<? super KeyEvent> getKeyPressHandler() {
-        //todo
+    @Override
+    public void pause() {
+        for (NodeAndAnimation nodeAndAnimation : drawings.values()) {
+            if (nodeAndAnimation.animation != null)
+                nodeAndAnimation.animation.pause();
+            if (nodeAndAnimation.tickAnimation != null)
+                nodeAndAnimation.tickAnimation.pause();
+        }
+        tickScheduler.pause();
+
+        onPauseAction.run();
     }
 
+    @Override
+    public void setGameLogic(Function<IField, Object> gameLogic) {
+        if (gameLogic == null)
+            gameLogic = NO_LOGIC;
+        this.gameLogic = gameLogic;
+    }
 
-    public void setObjectPainter(Function<IFieldObject, NodeAndAnimation> objectPainter) {
-        this.objectPainter = objectPainter;
+    @Override
+    public DoubleProperty rateProperty() {
+        return tickScheduler.rateProperty();
     }
 }
