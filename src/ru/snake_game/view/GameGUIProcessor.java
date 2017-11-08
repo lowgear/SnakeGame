@@ -98,14 +98,11 @@ public class GameGUIProcessor implements IGameGUIProcessor {
             throw new IllegalStateException();
 
         tickScheduler.setOnFinished((event) -> {
-
             game.tick();
             gameLogic.apply(game.getField());
-            long b = System.nanoTime();
             setUpGraphics();
-            System.out.println(System.nanoTime() - b);
 
-//            playAnimations();
+            playAnimations();
             tickScheduler.play();
         });
         tickScheduler.setRate(1);
@@ -157,6 +154,7 @@ public class GameGUIProcessor implements IGameGUIProcessor {
         game.getField().forEach(presentObjects::add);
         List<IFieldObject> drawnObjects = new LinkedList<>(drawings.keySet());
         tickScheduler.getChildren().clear();
+        //todo fix bug with deleted base timeline
         for (IFieldObject object : drawnObjects) {
             NodeAndAnimation nodeAndAnimation = drawings.get(object);
             if (!presentObjects.contains(object)) {
