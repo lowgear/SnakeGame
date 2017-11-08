@@ -1,18 +1,20 @@
 package ru.snake_game.view.util;
 
 import javafx.animation.Animation;
+import javafx.animation.Transition;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
+import javafx.util.Duration;
 import ru.snake_game.model.FieldObjects.Apple;
 import ru.snake_game.model.FieldObjects.SnakeBody;
 import ru.snake_game.model.FieldObjects.SnakeHead;
 import ru.snake_game.model.FieldObjects.Wall;
 import ru.snake_game.model.Interfaces.IFieldObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import ru.snake_game.model.util.Location;
 
 import java.util.HashMap;
 
@@ -59,7 +61,24 @@ public class SmoothPainter implements IFieldObjectPainter {
         Node node = HOW_TO_PAINT.get(object.getClass()).emit();
         Animation animation, tickAnimation;
 
-        //todo
-        throw new NotImplementedException();
+        animation = new Transition() {
+            {
+                setCycleDuration(Duration.seconds(2));
+                setCycleCount(INDEFINITE);
+            }
+            @Override
+            protected void interpolate(double frac) {
+                //
+            }
+        };
+
+        tickAnimation = new Transition() {
+            @Override
+            protected void interpolate(double frac) {
+                //
+            }
+        };
+
+        return new NodeAndAnimation(node, animation, tickAnimation);
     }
 }
