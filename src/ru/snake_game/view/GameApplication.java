@@ -14,7 +14,14 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import ru.snake_game.model.FieldGenerators;
+import ru.snake_game.model.FieldObjects.Apple;
+import ru.snake_game.model.Interfaces.IField;
+import ru.snake_game.model.Interfaces.IFieldObject;
+import ru.snake_game.model.util.Location;
 
+import java.util.HashSet;
+
+import static ru.snake_game.view.util.Extensions.getRandomItem;
 import static ru.snake_game.view.util.SmoothPainter.SMOOTH_PAINTER;
 
 public class GameApplication extends Application {
@@ -43,10 +50,31 @@ public class GameApplication extends Application {
         gameArea.setFocusTraversable(true);
     }
 
+    private static Object gameLogic(IField field) {
+        HashSet<Location> freeLocations = new HashSet<>();
+        for (int x = 0; x < field.getWidth(); x++)
+            for (int y = 0; y < field.getHeight(); y++)
+                freeLocations.add(new Location(x, y));
+        for (IFieldObject object :
+                field) {
+            freeLocations.remove(object.getLocation());
+        }
+
+        if (freeLocations.isEmpty())
+            return null;
+
+        Location appleLocation = getRandomItem(freeLocations);
+        Apple apple = new Apple(appleLocation, field, 1);
+        field.addObject(apple);
+
+        return null;
+    }
+
     private void startGame() {
         gameProcessor = new GameGUIProcessor(FieldGenerators.genBoardedField(FIELD_HEIGHT, FIELD_WIDTH), SMOOTH_PAINTER);
 
         gameProcessor.setOnPause(this::pauseGame);
+        gameProcessor.setGameLogic(GameApplication::gameLogic);
 
         initGameScene(gameProcessor.getScene());
         fitGameArea(gameProcessor.getScene());
