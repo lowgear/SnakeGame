@@ -194,11 +194,23 @@ public class GameApplication extends Application {
         primaryStage.setScene(mainMenuScene);
         primaryStage.show();
 
+        setUpPrimaryStageSize();
+    }
+
+    private void setUpPrimaryStageSize() {
+        Scene scene = primaryStage.getScene();
         primaryStage.setWidth(WINDOW_WIDTH
-                + mainMenuScene.getWindow().getWidth()
-                - mainMenuScene.getWidth());
+                + scene.getWindow().getWidth()
+                - scene.getWidth());
         primaryStage.setHeight(WINDOW_HEIGHT
-                + mainMenuScene.getWindow().getHeight()
-                - mainMenuScene.getHeight());
+                + scene.getWindow().getHeight()
+                - scene.getHeight());
+
+//        primaryStage.setWidth(WINDOW_WIDTH
+//                + mainMenuScene.getWindow().getWidth()
+//                - mainMenuScene.getWidth());
+//        primaryStage.setHeight(WINDOW_HEIGHT
+//                + mainMenuScene.getWindow().getHeight()
+//                - mainMenuScene.getHeight());
     }
 }
