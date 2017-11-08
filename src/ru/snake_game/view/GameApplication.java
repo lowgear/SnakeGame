@@ -51,14 +51,14 @@ public class GameApplication extends Application {
     }
 
     private static Object gameLogic(IField field) {
+        for (IFieldObject object : field)
+            if (object instanceof Apple)
+                return null;
         HashSet<Location> freeLocations = new HashSet<>();
         for (int x = 0; x < field.getWidth(); x++)
             for (int y = 0; y < field.getHeight(); y++)
-                freeLocations.add(new Location(x, y));
-        for (IFieldObject object :
-                field) {
-            freeLocations.remove(object.getLocation());
-        }
+                if (field.getObjectAt(x, y) == null)
+                    freeLocations.add(new Location(x, y));
 
         if (freeLocations.isEmpty())
             return null;
@@ -86,10 +86,12 @@ public class GameApplication extends Application {
     private void fitGameArea(SubScene gameArea) {
         double ratio;
         if (gameArea.getHeight() * WINDOW_WIDTH > WINDOW_HEIGHT * gameArea.getWidth())
-            ratio = gameArea.getHeight() / WINDOW_HEIGHT;
+            ratio = WINDOW_HEIGHT / gameArea.getHeight();
         else
-            ratio = gameArea.getWidth() / WINDOW_WIDTH;
+            ratio = WINDOW_WIDTH / gameArea.getWidth();
 
+//        gameArea.setWidth(gameArea.getWidth() * ratio);
+//        gameArea.setHeight(gameArea.getHeight() * ratio);
         gameArea.setScaleX(ratio);
         gameArea.setScaleY(ratio);
 

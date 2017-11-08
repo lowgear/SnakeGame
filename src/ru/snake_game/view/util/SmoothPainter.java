@@ -9,10 +9,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.util.Duration;
-import ru.snake_game.model.FieldObjects.Apple;
-import ru.snake_game.model.FieldObjects.SnakeBody;
-import ru.snake_game.model.FieldObjects.SnakeHead;
-import ru.snake_game.model.FieldObjects.Wall;
+import ru.snake_game.model.FieldObjects.*;
 import ru.snake_game.model.Interfaces.IFieldObject;
 import ru.snake_game.model.util.Location;
 
@@ -56,28 +53,54 @@ public class SmoothPainter implements IFieldObjectPainter {
         return res;
     }
 
+    private static Duration duration = new Duration(1000);
+
     @Override
     public NodeAndAnimation paint(IFieldObject object) {
         Node node = HOW_TO_PAINT.get(object.getClass()).emit();
-        Animation animation, tickAnimation;
+        node.setTranslateX(object.getLocation().getX() * CELL_SIZE);
+        node.setTranslateY(object.getLocation().getY() * CELL_SIZE);
 
-        animation = new Transition() {
-            {
-                setCycleDuration(Duration.seconds(2));
-                setCycleCount(INDEFINITE);
-            }
-            @Override
-            protected void interpolate(double frac) {
-                //
-            }
-        };
+        Animation animation = null, tickAnimation = null;
 
-        tickAnimation = new Transition() {
-            @Override
-            protected void interpolate(double frac) {
-                //
-            }
-        };
+        //todo implement eye blinking
+        /*if (object instanceof ISnakeHead)
+            animation = new Transition() {
+                {
+                    setCycleDuration(Duration.seconds(2));
+                }
+
+                @Override
+                protected void interpolate(double frac) {
+                    if (frac < 0.5)
+                        ((Circle) node).setFill(Color.MOCCASIN);
+                    else
+                        ((Circle) node).setFill(Color.LIGHTGREEN);
+                }
+            };*/
+
+        if (object instanceof SnakePart) {
+            tickAnimation = new Transition() {
+                private Location from = object.getLocation();
+                private Location to = object.getLocation();
+
+                {
+                    setCycleDuration(Duration.seconds(1));
+                }
+
+                @Override
+                protected void interpolate(double frac) {
+                    if (!object.getLocation().equals(to)) {
+                        from = to;
+                        to = object.getLocation();
+                    }
+                    double nX = (from.getX() + (to.getX() - from.getX()) * frac) * CELL_SIZE;
+                    double nY = (from.getY() + (to.getY() - from.getY()) * frac) * CELL_SIZE;
+                    node.setTranslateX(nX);
+                    node.setTranslateY(nY);
+                }
+            };
+        }
 
         return new NodeAndAnimation(node, animation, tickAnimation);
     }
