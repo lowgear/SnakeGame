@@ -11,6 +11,7 @@ import javafx.scene.shape.StrokeType;
 import javafx.util.Duration;
 import ru.snake_game.model.FieldObjects.*;
 import ru.snake_game.model.Interfaces.IFieldObject;
+import ru.snake_game.model.Interfaces.ISnakeHead;
 import ru.snake_game.model.util.Location;
 
 import java.util.HashMap;
@@ -53,7 +54,33 @@ public class SmoothPainter implements IFieldObjectPainter {
         return res;
     }
 
-    private static Duration duration = new Duration(1000);
+    private static Transition getSnakePartTickAnimation(SnakePart snakePart, Node node) {
+        return new Transition() {
+            private Location from = snakePart.getLocation();
+            private Location to = snakePart.getLocation();
+
+            {
+                setCycleDuration(Duration.seconds(1));
+            }
+
+            @Override
+            protected void interpolate(double frac) {
+                if (snakePart.getHead().isAlive()) {
+                    if (!snakePart.getLocation().equals(to)) {
+                        from = to;
+                        to = snakePart.getLocation();
+                    }
+                    double nX = (from.getX() + (to.getX() - from.getX()) * frac) * CELL_SIZE;
+                    double nY = (from.getY() + (to.getY() - from.getY()) * frac) * CELL_SIZE;
+                    node.setTranslateX(nX);
+                    node.setTranslateY(nY);
+                } else {
+                    node.setTranslateX(snakePart.getLocation().getX() * CELL_SIZE);
+                    node.setTranslateY(snakePart.getLocation().getY() * CELL_SIZE);
+                }
+            }
+        };
+    }
 
     @Override
     public NodeAndAnimation paint(IFieldObject object) {
@@ -64,7 +91,7 @@ public class SmoothPainter implements IFieldObjectPainter {
         Animation animation = null, tickAnimation = null;
 
         //todo implement eye blinking
-        /*if (object instanceof ISnakeHead)
+        if (object instanceof ISnakeHead)
             animation = new Transition() {
                 {
                     setCycleDuration(Duration.seconds(2));
@@ -72,34 +99,15 @@ public class SmoothPainter implements IFieldObjectPainter {
 
                 @Override
                 protected void interpolate(double frac) {
-                    if (frac < 0.5)
-                        ((Circle) node).setFill(Color.MOCCASIN);
-                    else
+                    if (((ISnakeHead) object).isAlive())
                         ((Circle) node).setFill(Color.LIGHTGREEN);
-                }
-            };*/
-
-        if (object instanceof SnakePart) {
-            tickAnimation = new Transition() {
-                private Location from = object.getLocation();
-                private Location to = object.getLocation();
-
-                {
-                    setCycleDuration(Duration.seconds(1));
-                }
-
-                @Override
-                protected void interpolate(double frac) {
-                    if (!object.getLocation().equals(to)) {
-                        from = to;
-                        to = object.getLocation();
-                    }
-                    double nX = (from.getX() + (to.getX() - from.getX()) * frac) * CELL_SIZE;
-                    double nY = (from.getY() + (to.getY() - from.getY()) * frac) * CELL_SIZE;
-                    node.setTranslateX(nX);
-                    node.setTranslateY(nY);
+                    else
+                        ((Circle) node).setFill(Color.RED);
                 }
             };
+
+        if (object instanceof SnakePart) {
+            tickAnimation = getSnakePartTickAnimation((SnakePart) object, node);
         }
 
         return new NodeAndAnimation(node, animation, tickAnimation);

@@ -13,7 +13,6 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
     private boolean alive = true;
     private boolean justAte;
-    private int cnt = 0;
 
     public SnakeHead(Location location, SnakeBody prev, Vector direction, IField field) {
         super(location, prev, field);
@@ -82,7 +81,7 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
     }
 
     @Override
-    protected ISnakeHead getHead() {
+    public ISnakeHead getHead() {
         return this;
     }
 
@@ -100,7 +99,6 @@ public class SnakeHead extends SnakePart implements ISnakeHead {
 
         if (prev == null || !prev.getLocation().equals(getLocation().moved(direction)))
             this.direction = direction;
-        cnt++;
     }
 
     @Override

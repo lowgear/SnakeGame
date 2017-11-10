@@ -17,5 +17,7 @@ public interface IGameGUIProcessor {
 
     void setGameLogic(Function<IField, Object> gameLogic);
 
+    boolean isPlaying();
+
     DoubleProperty rateProperty();
 }

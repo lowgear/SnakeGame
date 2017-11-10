@@ -28,6 +28,8 @@ import static ru.snake_game.view.util.NodeAndAnimation.CELL_SIZE;
 
 public class GameGUIProcessor implements IGameGUIProcessor {
     private static final Function<IField, Object> NO_LOGIC = (field) -> null;
+    private static final Duration TICK_DURATION = Duration.seconds(1);
+
     private final SubScene gameArea;
     private final ISnakeHead snake;
     private final Game game;
@@ -35,11 +37,11 @@ public class GameGUIProcessor implements IGameGUIProcessor {
     private final HashMap<IFieldObject, NodeAndAnimation> drawings = new HashMap<>();
     private final ParallelTransition tickScheduler = new ParallelTransition();
     private final IFieldObjectPainter objectPainter;
-    private final boolean inited;
-    private Duration tickDuration = Duration.seconds(1);
+    private final boolean initialized;
+
     private Runnable onPauseAction;
     private Function<IField, Object> gameLogic = NO_LOGIC;
-    private boolean isPlaying = false;
+    private Timeline tickTimer = new Timeline(new KeyFrame(TICK_DURATION));
 
     public GameGUIProcessor(IField field, IFieldObjectPainter objectPainter) {
         gameArea = new SubScene(
@@ -57,7 +59,7 @@ public class GameGUIProcessor implements IGameGUIProcessor {
         setUpControls();
         setUpGraphics();
 
-        inited = true;
+        initialized = true;
     }
 
     private static ISnakeHead findSnake(IField field) {
@@ -75,7 +77,7 @@ public class GameGUIProcessor implements IGameGUIProcessor {
     }
 
     private void setUpControls() {
-        if (inited)
+        if (initialized)
             throw new IllegalStateException();
 
         HashMap<KeyCode, Runnable> keyPressActions = new HashMap<>();
@@ -94,37 +96,29 @@ public class GameGUIProcessor implements IGameGUIProcessor {
     }
 
     private void setUpAnimations() {
-        if (inited)
+        if (initialized)
             throw new IllegalStateException();
 
         tickScheduler.setOnFinished((event) -> {
             game.tick();
             gameLogic.apply(game.getField());
-            setUpGraphics();
 
+            setUpGraphics();
             playAnimations();
-            tickScheduler.play();
         });
-        tickScheduler.setRate(1);
-//        tickScheduler.setCycleCount(Animation.INDEFINITE);
-        Timeline tl = new Timeline(new KeyFrame(tickDuration));
-        tickScheduler.getChildren().add(tl);
+        tickScheduler.setRate(3);
+
+        tickScheduler.getChildren().add(tickTimer);
     }
 
     private void playAnimations() {
-        for (NodeAndAnimation nodeAndAnimation : drawings.values()) {
+        tickScheduler.play();
+        for (NodeAndAnimation nodeAndAnimation : drawings.values())
             if (nodeAndAnimation.animation != null)
                 nodeAndAnimation.animation.play();
-//            if (nodeAndAnimation.tickAnimation != null)
-//                nodeAndAnimation.tickAnimation.play();
-        }
     }
 
     private void setUpGraphics() {
-//        if (inited)
-//            throw new IllegalStateException();
-
-
         removeNotPresentObjects();
         addNewObjects();
         objectsGroup.getChildren().clear();
@@ -140,12 +134,10 @@ public class GameGUIProcessor implements IGameGUIProcessor {
                 normalizeAnimationToTick(nodeAndAnimation.tickAnimation);
                 objectsGroup.getChildren().add(nodeAndAnimation.node);
                 drawings.put(object, nodeAndAnimation);
-                if (isPlaying)
-                    if (nodeAndAnimation.animation != null)
+                if (isPlaying() && nodeAndAnimation.animation != null)
                         nodeAndAnimation.animation.play();
                 if (nodeAndAnimation.tickAnimation != null)
                     tickScheduler.getChildren().add(nodeAndAnimation.tickAnimation);
-//                    nodeAndAnimation.tickAnimation.stop();
             }
     }
 
@@ -153,23 +145,22 @@ public class GameGUIProcessor implements IGameGUIProcessor {
         HashSet<IFieldObject> presentObjects = new HashSet<>();
         game.getField().forEach(presentObjects::add);
         List<IFieldObject> drawnObjects = new LinkedList<>(drawings.keySet());
-        tickScheduler.getChildren().clear();
-        //todo fix bug with deleted base timeline
         for (IFieldObject object : drawnObjects) {
-            NodeAndAnimation nodeAndAnimation = drawings.get(object);
             if (!presentObjects.contains(object)) {
+                NodeAndAnimation nodeAndAnimation = drawings.get(object);
                 if (nodeAndAnimation.animation != null)
                     nodeAndAnimation.animation.stop();
+                if (nodeAndAnimation.tickAnimation != null)
+                    tickScheduler.getChildren().remove(nodeAndAnimation.tickAnimation);
                 drawings.remove(object);
-            } else if (nodeAndAnimation.tickAnimation != null)
-                tickScheduler.getChildren().add(nodeAndAnimation.tickAnimation);
+            }
         }
     }
 
     private void normalizeAnimationToTick(Animation animation) {
         if (animation == null)
             return;
-        double rate = tickDuration.toMillis() / animation.getCycleDuration().toMillis();
+        double rate = TICK_DURATION.toMillis() / animation.getCycleDuration().toMillis();
         animation.setRate(rate);
     }
 
@@ -185,14 +176,12 @@ public class GameGUIProcessor implements IGameGUIProcessor {
 
     @Override
     public void play() {
-        isPlaying = true;
         playAnimations();
         tickScheduler.play();
     }
 
     @Override
     public void pause() {
-        isPlaying = false;
         for (NodeAndAnimation nodeAndAnimation : drawings.values()) {
             if (nodeAndAnimation.animation != null)
                 nodeAndAnimation.animation.pause();
@@ -209,6 +198,11 @@ public class GameGUIProcessor implements IGameGUIProcessor {
         if (gameLogic == null)
             gameLogic = NO_LOGIC;
         this.gameLogic = gameLogic;
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return tickScheduler.getStatus() == Animation.Status.RUNNING;
     }
 
     @Override

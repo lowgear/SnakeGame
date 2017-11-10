@@ -22,7 +22,7 @@ public class SnakeBody extends SnakePart {
     }
 
     @Override
-    protected ISnakeHead getHead() {
+    public ISnakeHead getHead() {
         return head;
     }
 }

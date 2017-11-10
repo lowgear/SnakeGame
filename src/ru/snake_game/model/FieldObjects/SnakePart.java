@@ -35,5 +35,6 @@ public abstract class SnakePart extends AbstractSolidFieldObject {
             snakeHead.kill();
     }
 
-    protected abstract ISnakeHead getHead();
+
+    public abstract ISnakeHead getHead();
 }

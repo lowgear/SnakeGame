@@ -64,7 +64,7 @@ public class GameApplication extends Application {
             return null;
 
         Location appleLocation = getRandomItem(freeLocations);
-        Apple apple = new Apple(appleLocation, field, 1);
+        Apple apple = new Apple(appleLocation, field, 3);
         field.addObject(apple);
 
         return null;
