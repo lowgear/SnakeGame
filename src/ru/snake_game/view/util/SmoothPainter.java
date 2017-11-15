@@ -154,20 +154,13 @@ public class SmoothPainter implements IFieldObjectPainter {
         Group group = null;
 
         if (object instanceof ISnakeHead) {
-
-            Vector direction = ((SnakeHead)object).getDirection();
-            int kleftX = direction.getX() == 1 ? 1 : -1;
-            int kleftY = direction.getY() == 1 ? 1 : -1;
-            int krightX = direction.getX() == -1 ? -1 : 1;
-            int krightY = direction.getY() == -1 ? -1 : 1;
-
             Node leftEye = makeSnakeEye();
-            leftEye.setTranslateX((object.getLocation().getX() * CELL_SIZE) + kleftX * CELL_SIZE / 4);
-            leftEye.setTranslateY((object.getLocation().getY() * CELL_SIZE) + kleftY * CELL_SIZE / 4);
+            leftEye.setTranslateX((object.getLocation().getX() * CELL_SIZE) + CELL_SIZE / 4);
+            leftEye.setTranslateY((object.getLocation().getY() * CELL_SIZE) - CELL_SIZE / 4);
 
             Node rightEye = makeSnakeEye();
-            rightEye.setTranslateX((object.getLocation().getX() * CELL_SIZE) + krightX * CELL_SIZE / 4);
-            rightEye.setTranslateY((object.getLocation().getY() * CELL_SIZE) + krightY * CELL_SIZE / 4);
+            rightEye.setTranslateX((object.getLocation().getX() * CELL_SIZE) + CELL_SIZE / 4);
+            rightEye.setTranslateY((object.getLocation().getY() * CELL_SIZE) + CELL_SIZE / 4);
 
             group = new Group();
             group.getChildren().add(node);
